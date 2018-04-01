@@ -8,6 +8,11 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using ImageService.Logging;
+using ImageService.Logging.Modal;
+using ImageService.Server;
+using ImageService.Modal;
+using ImageService.Controller;
 
 namespace ImageService
 {
@@ -36,6 +41,11 @@ namespace ImageService
 
     public partial class ImageService : ServiceBase
     {
+        private ImageServer m_imageServer;          // The Image Server
+        private IImageServiceModal modal;
+        private IImageController controller;
+        private ILoggingService logging;
+
         private int eventId = 1;
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool SetServiceStatus(IntPtr handle, ref ServiceStatus serviceStatus);
@@ -60,6 +70,19 @@ namespace ImageService
             }
             eventLog1.Source = eventSourceName;
             eventLog1.Log = logName;
+           
+            // create logger
+            logging = new LoggingService();
+            logging.MessageRecieved += eventLogMessage;
+
+            // create image service model
+            modal = new ImageServiceModal("bla", 250);
+
+            // create image controller
+            controller = new ImageController(modal);
+
+            // create image server
+            m_imageServer = new ImageServer(controller, logging);
         }
 
         protected override void OnStart(string[] args)
@@ -70,6 +93,7 @@ namespace ImageService
             serviceStatus.dwWaitHint = 100000;
             SetServiceStatus(this.ServiceHandle, ref serviceStatus);
 
+            // write start to event log
             eventLog1.WriteEntry("In OnStart");
 
             // Set up a timer to trigger every minute.  
@@ -83,14 +107,24 @@ namespace ImageService
             SetServiceStatus(this.ServiceHandle, ref serviceStatus);
         }
 
+        private void eventLogMessage(Object sender, MessageRecievedEventArgs e)
+        {
+            eventLog1.WriteEntry(e.Message);
+        }
+
         protected override void OnContinue()
         {
+            // write continue to event log
             eventLog1.WriteEntry("In OnContinue.");
         }
 
         protected override void OnStop()
         {
+            // write stop to event log
             eventLog1.WriteEntry("In onStop.");
+
+            // close the server
+            this.m_imageServer.CloseServer();
         }
 
         public void OnTimer(object sender, System.Timers.ElapsedEventArgs args)

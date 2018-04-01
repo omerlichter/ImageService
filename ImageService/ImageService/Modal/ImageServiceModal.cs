@@ -18,5 +18,16 @@ namespace ImageService.Modal
        
         #endregion
 
+        public ImageServiceModal(string outputFolder, int thumbnailSize)
+        {
+            this.m_OutputFolder = outputFolder;
+            this.m_thumbnailSize = thumbnailSize;
+        }
+
+        public string AddFile(string path, out bool result)
+        {
+           
+
+        }
     }
 }
