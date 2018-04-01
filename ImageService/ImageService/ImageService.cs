@@ -13,6 +13,7 @@ using ImageService.Logging.Modal;
 using ImageService.Server;
 using ImageService.Modal;
 using ImageService.Controller;
+using System.Configuration;
 
 namespace ImageService
 {
@@ -53,8 +54,10 @@ namespace ImageService
         public ImageService(string[] args)
         {
             InitializeComponent();
-            string eventSourceName = "MySource";
-            string logName = "MyNewLog";
+            string eventSourceName = ConfigurationManager.AppSettings.Get("SourceName");
+            string logName = ConfigurationManager.AppSettings.Get("LogName");
+            string outputFolder = ConfigurationManager.AppSettings.Get("OutputDir");
+            int thumbnailSize = Int32.Parse(ConfigurationManager.AppSettings.Get("ThumbnailSize"));
             if (args.Count() > 0)
             {
                 eventSourceName = args[0];
@@ -76,7 +79,7 @@ namespace ImageService
             logging.MessageRecieved += eventLogMessage;
 
             // create image service model
-            modal = new ImageServiceModal("bla", 250);
+            modal = new ImageServiceModal(outputFolder, thumbnailSize);
 
             // create image controller
             controller = new ImageController(modal);

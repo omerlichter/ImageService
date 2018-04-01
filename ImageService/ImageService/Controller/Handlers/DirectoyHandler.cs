@@ -44,12 +44,22 @@ namespace ImageService.Controller.Handlers
         public void OnCommandRecieved(object sender, CommandRecievedEventArgs e)
         {
             bool resultSuccesful;
+
+            // if the command is close
+            if (e.CommandID == (int)CommandEnum.CloseCommand)
+            {
+                m_logging.Log("close command execute in handler", MessageTypeEnum.INFO);
+                EndHandler();
+                return;
+            }
+
+
             if (e.RequestDirPath.Equals(this.m_path))
             {
-                m_controller.ExecuteCommand(e.CommandID, e.Args, out resultSuccesful);
+                string msg = m_controller.ExecuteCommand(e.CommandID, e.Args, out resultSuccesful);
                 if (resultSuccesful == false)
                 {
-                    m_logging.Log("error on execute command", MessageTypeEnum.FAIL);
+                    m_logging.Log("error on execute command: " + msg, MessageTypeEnum.FAIL);
                 }
                 m_logging.Log("the command execute succesful", MessageTypeEnum.INFO);
             }
@@ -64,6 +74,17 @@ namespace ImageService.Controller.Handlers
                 CommandRecievedEventArgs eventArgs = new CommandRecievedEventArgs((int)CommandEnum.NewFileCommand, args, this.m_path);
                 this.OnCommandRecieved(this, eventArgs);
             }
+        }
+
+        private void EndHandler()
+        {
+            this.m_dirWatcher.EnableRaisingEvents = false;
+            this.m_dirWatcher.Created -= new FileSystemEventHandler(DirectoryChanged);
+            this.m_dirWatcher.Changed -= new FileSystemEventHandler(DirectoryChanged);
+
+            DirectoryCloseEventArgs closeArgs = new DirectoryCloseEventArgs(this.m_path, "directory " + this.m_path + "closed");
+
+            DirectoryClose?.Invoke(this, closeArgs);
         }
     }
 }
