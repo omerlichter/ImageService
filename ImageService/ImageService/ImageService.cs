@@ -83,9 +83,6 @@ namespace ImageService
 
             // create image controller
             controller = new ImageController(modal);
-
-            // create image server
-            m_imageServer = new ImageServer(controller, logging);
         }
 
         protected override void OnStart(string[] args)
@@ -98,6 +95,9 @@ namespace ImageService
 
             // write start to event log
             eventLog1.WriteEntry("In OnStart");
+
+            // create image server
+            m_imageServer = new ImageServer(controller, logging);
 
             // Set up a timer to trigger every minute.  
             System.Timers.Timer timer = new System.Timers.Timer();
@@ -123,11 +123,21 @@ namespace ImageService
 
         protected override void OnStop()
         {
+            // Update the service state to stop Pending.  
+            ServiceStatus serviceStatus = new ServiceStatus();
+            serviceStatus.dwCurrentState = ServiceState.SERVICE_STOP_PENDING;
+            serviceStatus.dwWaitHint = 100000;
+            SetServiceStatus(this.ServiceHandle, ref serviceStatus);
+
             // write stop to event log
             eventLog1.WriteEntry("In onStop.");
 
             // close the server
             this.m_imageServer.CloseServer();
+
+            // Update the service state to Running.  
+            serviceStatus.dwCurrentState = ServiceState.SERVICE_STOPPED;
+            SetServiceStatus(this.ServiceHandle, ref serviceStatus);
         }
 
         public void OnTimer(object sender, System.Timers.ElapsedEventArgs args)

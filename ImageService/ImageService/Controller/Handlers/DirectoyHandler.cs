@@ -61,7 +61,10 @@ namespace ImageService.Controller.Handlers
                 {
                     m_logging.Log("error on execute command: " + msg, MessageTypeEnum.FAIL);
                 }
-                m_logging.Log("the command execute succesful", MessageTypeEnum.INFO);
+                else
+                {
+                    m_logging.Log("the command execute succesful", MessageTypeEnum.INFO);
+                }
             }
         }
 
