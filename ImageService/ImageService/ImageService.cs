@@ -40,20 +40,31 @@ namespace ImageService
         public int dwWaitHint;
     };
 
+    /// <summary>
+    /// Image service class.
+    /// </summary>
     public partial class ImageService : ServiceBase
     {
+        #region Members
         private ImageServer m_imageServer;          // The Image Server
         private IImageServiceModal modal;
         private IImageController controller;
         private ILoggingService logging;
-
         private int eventId = 1;
+        #endregion
+
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool SetServiceStatus(IntPtr handle, ref ServiceStatus serviceStatus);
 
+        /// <summary>
+        /// constructor.
+        /// </summary>
+        /// <param name="args">args from command line</param>
         public ImageService(string[] args)
         {
+            // initialize
             InitializeComponent();
+            // get values from app.config
             string eventSourceName = ConfigurationManager.AppSettings.Get("SourceName");
             string logName = ConfigurationManager.AppSettings.Get("LogName");
             string outputFolder = ConfigurationManager.AppSettings.Get("OutputDir");
@@ -85,6 +96,10 @@ namespace ImageService
             controller = new ImageController(modal);
         }
 
+        /// <summary>
+        /// on start of the service.
+        /// </summary>
+        /// <param name="args">args from command line</param>
         protected override void OnStart(string[] args)
         {
             // Update the service state to Start Pending.  
@@ -110,17 +125,37 @@ namespace ImageService
             SetServiceStatus(this.ServiceHandle, ref serviceStatus);
         }
 
+        /// <summary>
+        /// the function called in event log.
+        /// </summary>
+        /// <param name="sender">the sender event object</param>
+        /// <param name="e">args for the event, message and type</param>
         private void eventLogMessage(Object sender, MessageRecievedEventArgs e)
         {
-            eventLog1.WriteEntry(e.Message);
+            // get the type of the message
+            EventLogEntryType type;
+            switch(e.Status)
+            {
+                case MessageTypeEnum.WARNING: type = EventLogEntryType.Warning; break;
+                case MessageTypeEnum.FAIL: type = EventLogEntryType.Error; break;
+                case MessageTypeEnum.INFO: type = EventLogEntryType.Information; break;
+                default: type = EventLogEntryType.Information; break;
+            }
+            eventLog1.WriteEntry(e.Message, type);
         }
 
+        /// <summary>
+        /// on continue of the service.
+        /// </summary>
         protected override void OnContinue()
         {
             // write continue to event log
             eventLog1.WriteEntry("In OnContinue.");
         }
 
+        /// <summary>
+        /// on stop of the service
+        /// </summary>
         protected override void OnStop()
         {
             // Update the service state to stop Pending.  
@@ -140,6 +175,11 @@ namespace ImageService
             SetServiceStatus(this.ServiceHandle, ref serviceStatus);
         }
 
+        /// <summary>
+        /// the function called every minute, to monitoring the service.
+        /// </summary>
+        /// <param name="sender">the sender event object</param>
+        /// <param name="args">args for the event</param>
         public void OnTimer(object sender, System.Timers.ElapsedEventArgs args)
         {
             // TODO: Insert monitoring activities here.  

@@ -24,11 +24,17 @@ namespace ImageService.Server
         public event EventHandler<CommandRecievedEventArgs> CommandRecieved;          // The event that notifies about a new Command being recieved
         #endregion
         
+        /// <summary>
+        /// constructor, create handlers for all the directoris in the config file.
+        /// </summary>
+        /// <param name="controller">controller</param>
+        /// <param name="logging">logger</param>
         public ImageServer(IImageController controller, ILoggingService logging)
         {
             this.m_controller = controller;
             this.m_logging = logging;
 
+            // create handlers for all the directories
             string[] directories = ConfigurationManager.AppSettings.Get("Handler").Split(';');
             foreach(string directoryPath in directories)
             {
@@ -36,19 +42,35 @@ namespace ImageService.Server
             }
         }
 
+        /// <summary>
+        /// craete handler to monitoring the directory path.
+        /// </summary>
+        /// <param name="directoryPath">path to the directory</param>
         public void CreateHandler(string directoryPath)
         {
+            // create handler
             IDirectoryHandler directoryHandler = new DirectoyHandler(this.m_controller, this.m_logging);
+            // add to events
             CommandRecieved += directoryHandler.OnCommandRecieved;
             directoryHandler.DirectoryClose += this.DeleteHandler;
+            // start the handler
             directoryHandler.StartHandleDirectory(directoryPath);
         }
 
+        /// <summary>
+        /// send command to all handlers by event.
+        /// </summary>
+        /// <param name="e">args for the event</param>
         public void SendCommand(CommandRecievedEventArgs e)
         {
             CommandRecieved?.Invoke(this, e);
         }
 
+        /// <summary>
+        /// delete handler and stop the monitoring on the directory.
+        /// </summary>
+        /// <param name="source">object that send the event</param>
+        /// <param name="e">args for the event</param>
         public void DeleteHandler(object source, DirectoryCloseEventArgs e)
         {
             IDirectoryHandler directoryHandler = (IDirectoryHandler)source;
@@ -57,6 +79,9 @@ namespace ImageService.Server
             this.m_logging.Log(e.Message, MessageTypeEnum.INFO);
         }
 
+        /// <summary>
+        /// send close server to all handlers.
+        /// </summary>
         public void CloseServer()
         {
             CommandRecievedEventArgs commandArgs = new CommandRecievedEventArgs((int)CommandEnum.CloseCommand, null, null);

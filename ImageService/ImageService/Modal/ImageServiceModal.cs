@@ -15,15 +15,25 @@ namespace ImageService.Modal
         #region Members
         private string m_OutputFolder;            // The Output Folder
         private int m_thumbnailSize;              // The Size Of The Thumbnail Size
-       
         #endregion
 
+        /// <summary>
+        /// constructor.
+        /// </summary>
+        /// <param name="outputFolder">output folder of the images</param>
+        /// <param name="thumbnailSize">thumbnail size</param>
         public ImageServiceModal(string outputFolder, int thumbnailSize)
         {
             this.m_OutputFolder = outputFolder;
             this.m_thumbnailSize = thumbnailSize;
         }
 
+        /// <summary>
+        /// copy the file in the directory, create new directory in output directory of year and month.
+        /// </summary>
+        /// <param name="path">path of the image</param>
+        /// <param name="result">return if the command succed</param>
+        /// <returns>if succed return the path of the image, else return the exception</returns>
         public string AddFile(string path, out bool result)
         {
            if (File.Exists(path))
@@ -61,11 +71,13 @@ namespace ImageService.Modal
                         }
                     }
 
+                    // return the path of the image
                     result = true;
                     return m_OutputFolder + targetPath;
                 }
                 catch(Exception e)
                 {
+                    // return the exception
                     result = false;
                     return e.Message;
                 }

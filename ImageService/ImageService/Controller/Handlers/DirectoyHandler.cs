@@ -23,24 +23,41 @@ namespace ImageService.Controller.Handlers
         private readonly string[] filters = {".jpg", ".png", ".gif", ".bmp"};      // the filters
         #endregion
 
+        #region Properties
         public event EventHandler<DirectoryCloseEventArgs> DirectoryClose;              // The Event That Notifies that the Directory is being closed
+        #endregion
 
-		// Implement Here!
+        /// <summary>
+        /// constructor.
+        /// </summary>
+        /// <param name="controller">controller</param>
+        /// <param name="Logging">logger</param>
         public DirectoyHandler(IImageController controller, ILoggingService Logging)
         {
             this.m_controller = controller;
             this.m_logging = Logging;
         }
 
+        /// <summary>
+        /// start handle and monitoring the directory.
+        /// </summary>
+        /// <param name="dirPath">path to the directory</param>
         public void StartHandleDirectory(string dirPath)
         {
             this.m_path = dirPath;
+            // add dirWatcher
             this.m_dirWatcher = new FileSystemWatcher(this.m_path);
+            // add events
             this.m_dirWatcher.Changed += new FileSystemEventHandler(DirectoryChanged);
             this.m_dirWatcher.Created += new FileSystemEventHandler(DirectoryChanged);
             this.m_dirWatcher.EnableRaisingEvents = true;
         }
 
+        /// <summary>
+        /// on command recieved.
+        /// </summary>
+        /// <param name="sender">the object that send the event</param>
+        /// <param name="e">event args</param>
         public void OnCommandRecieved(object sender, CommandRecievedEventArgs e)
         {
             bool resultSuccesful;
@@ -53,32 +70,46 @@ namespace ImageService.Controller.Handlers
                 return;
             }
 
-
+            // if is other command
             if (e.RequestDirPath.Equals(this.m_path))
             {
                 string msg = m_controller.ExecuteCommand(e.CommandID, e.Args, out resultSuccesful);
                 if (resultSuccesful == false)
                 {
+                    // fail
                     m_logging.Log("error on execute command: " + msg, MessageTypeEnum.FAIL);
                 }
                 else
                 {
-                    m_logging.Log("the command execute succesful", MessageTypeEnum.INFO);
+                    // succeed
+                    m_logging.Log("the command with ID: " + e.CommandID + " execute successfully", MessageTypeEnum.INFO);
                 }
             }
         }
 
+        /// <summary>
+        /// called when new file created in the directory, or file changed
+        /// </summary>
+        /// <param name="source">the object that send the event</param>
+        /// <param name="e">event args</param>
         private void DirectoryChanged(object source, FileSystemEventArgs e)
         {
+            // args for the controller
             string[] args = { e.FullPath };
+            // get the file type
             string fileType = Path.GetExtension(e.FullPath).ToLower();
+            // check if the file type is {.bmp, .jpg, .png, .gif}
             if (filters.Contains(fileType))
             {
+                // send command
                 CommandRecievedEventArgs eventArgs = new CommandRecievedEventArgs((int)CommandEnum.NewFileCommand, args, this.m_path);
                 this.OnCommandRecieved(this, eventArgs);
             }
         }
 
+        /// <summary>
+        /// close the handler, stop monitoring the directory and send event of closing.
+        /// </summary>
         private void EndHandler()
         {
             this.m_dirWatcher.EnableRaisingEvents = false;
