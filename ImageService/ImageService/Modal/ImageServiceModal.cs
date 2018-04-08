@@ -43,10 +43,25 @@ namespace ImageService.Modal
         {
            if (File.Exists(path))
            {
+                DateTime date;
                 try
                 {
-                    // get the creation time of the image
-                    DateTime date = this.GetDateTakenFromImage(path);
+                    // get the taken date of the image
+                    date = this.GetDateTakenFromImage(path);      
+                } catch
+                {
+                    try
+                    {
+                        date = File.GetCreationTime(path);
+                    } catch (Exception e)
+                    {
+                        result = false;
+                        return "error in getting taken or creation time: " + e.Message; 
+                    }
+                }
+
+                try
+                {
                     string year = date.Year.ToString();
                     string month = date.Month.ToString();
 
@@ -57,13 +72,17 @@ namespace ImageService.Modal
                     Directory.CreateDirectory(m_OutputFolder + "\\" + "Thumbnails");
                     // craete the year and month folders
                     string targetPath = "\\" + year + "\\" + month;
+                  
                     Directory.CreateDirectory(m_OutputFolder + targetPath);
                     Directory.CreateDirectory(m_OutputFolder + "\\" + "Thumbnails" + targetPath);
 
+                    string fullTargetPath = m_OutputFolder + "\\" + year + "\\" + month + "\\" + Path.GetFileName(path);
+                    string fullTargetThumbnailsPath = m_OutputFolder + "\\" + "Thumbnails" + "\\" + year + "\\" + month + "\\" + Path.GetFileName(path);
+
                     // copy the file if not exist already
-                    if (!File.Exists(m_OutputFolder + targetPath + "\\" + Path.GetFileName(path)))
+                    if (!File.Exists(fullTargetPath))
                     {
-                        File.Move(path, m_OutputFolder + targetPath + "\\" + Path.GetFileName(path));
+                        File.Move(path, fullTargetPath);
                     }
                     else
                     {
@@ -72,12 +91,12 @@ namespace ImageService.Modal
                     }
 
                     // create thumbnail if not exist already
-                    if (!File.Exists(m_OutputFolder + "\\" + "Thumbnails" + targetPath + "\\" + Path.GetFileName(path)))
+                    if (!File.Exists(fullTargetThumbnailsPath))
                     {
-                        using (Image image = Image.FromFile(path))
+                        using (Image image = Image.FromFile(fullTargetPath))
                         using (Image thumbnail = image.GetThumbnailImage(this.m_thumbnailSize, this.m_thumbnailSize, () => false, IntPtr.Zero))
                         {
-                            thumbnail.Save(m_OutputFolder + "\\" + "Thumbnails" + targetPath + "\\" + Path.GetFileName(path));
+                            thumbnail.Save(fullTargetThumbnailsPath);
                         }
                     }
 
