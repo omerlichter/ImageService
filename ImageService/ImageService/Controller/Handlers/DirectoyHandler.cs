@@ -112,9 +112,15 @@ namespace ImageService.Controller.Handlers
         /// </summary>
         private void EndHandler()
         {
-            this.m_dirWatcher.EnableRaisingEvents = false;
-            this.m_dirWatcher.Created -= new FileSystemEventHandler(DirectoryChanged);
-            this.m_dirWatcher.Changed -= new FileSystemEventHandler(DirectoryChanged);
+            try
+            {
+                this.m_dirWatcher.EnableRaisingEvents = false;
+                this.m_dirWatcher.Created -= new FileSystemEventHandler(DirectoryChanged);
+                this.m_dirWatcher.Changed -= new FileSystemEventHandler(DirectoryChanged);
+            } catch (Exception e)
+            {
+                m_logging.Log(e.Message, MessageTypeEnum.FAIL);
+            }
 
             DirectoryCloseEventArgs closeArgs = new DirectoryCloseEventArgs(this.m_path, "directory " + this.m_path + "closed");
 

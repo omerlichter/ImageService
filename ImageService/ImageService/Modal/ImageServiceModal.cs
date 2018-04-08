@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,10 @@ namespace ImageService.Modal
         #region Members
         private string m_OutputFolder;            // The Output Folder
         private int m_thumbnailSize;              // The Size Of The Thumbnail Size
+        
+        //we init this once so that if the function is repeatedly called
+        //it isn't stressing the garbage man
+        private static Regex r = new Regex(":");
         #endregion
 
         /// <summary>
@@ -41,7 +46,7 @@ namespace ImageService.Modal
                 try
                 {
                     // get the creation time of the image
-                    DateTime date = File.GetCreationTime(path);
+                    DateTime date = this.GetDateTakenFromImage(path);
                     string year = date.Year.ToString();
                     string month = date.Month.ToString();
 
@@ -58,7 +63,12 @@ namespace ImageService.Modal
                     // copy the file if not exist already
                     if (!File.Exists(m_OutputFolder + targetPath + "\\" + Path.GetFileName(path)))
                     {
-                        File.Copy(path, m_OutputFolder + targetPath + "\\" + Path.GetFileName(path));
+                        File.Move(path, m_OutputFolder + targetPath + "\\" + Path.GetFileName(path));
+                    }
+                    else
+                    {
+                        result = false;
+                        return "file name already exist";
                     }
 
                     // create thumbnail if not exist already
@@ -87,7 +97,18 @@ namespace ImageService.Modal
                 result = false;
                 return "file not exist";
            }
+        }
 
+        //retrieves the datetime WITHOUT loading the whole image
+        private DateTime GetDateTakenFromImage(string path)
+        {
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            using (Image myImage = Image.FromStream(fs, false, false))
+            {
+                PropertyItem propItem = myImage.GetPropertyItem(36867);
+                string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
+                return DateTime.Parse(dateTaken);
+            }
         }
     }
 }
