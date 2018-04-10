@@ -41,13 +41,13 @@ namespace ImageService.Modal
         /// <returns>if succed return the path of the image, else return the exception</returns>
         public string AddFile(string path, out bool result)
         {
-           if (File.Exists(path))
-           {
+            if (File.Exists(path))
+            {
                 DateTime date;
                 try
                 {
                     // get the taken date of the image
-                    date = this.GetDateTakenFromImage(path);      
+                    date = this.GetDateTakenFromImage(path);   
                 } catch
                 {
                     try
@@ -62,11 +62,11 @@ namespace ImageService.Modal
 
                 try
                 {
-                    string year = date.Year.ToString();
-                    string month = date.Month.ToString();
-
                     // create the output folder if is not already exist
                     Directory.CreateDirectory(m_OutputFolder);
+
+                    string year = date.Year.ToString();
+                    string month = date.Month.ToString();
 
                     // create the thumbnails folder
                     Directory.CreateDirectory(m_OutputFolder + "\\" + "Thumbnails");
@@ -76,27 +76,34 @@ namespace ImageService.Modal
                     Directory.CreateDirectory(m_OutputFolder + targetPath);
                     Directory.CreateDirectory(m_OutputFolder + "\\" + "Thumbnails" + targetPath);
 
-                    string fullTargetPath = m_OutputFolder + "\\" + year + "\\" + month + "\\" + Path.GetFileName(path);
-                    string fullTargetThumbnailsPath = m_OutputFolder + "\\" + "Thumbnails" + "\\" + year + "\\" + month + "\\" + Path.GetFileName(path);
+                    string fullTargetPath = m_OutputFolder + "\\" + year + "\\" + month + "\\";
+                    string fullTargetThumbnailsPath = m_OutputFolder + "\\" + "Thumbnails" + "\\" + year + "\\" + month + "\\";
+
+                    string fileNameWithoutExtention = Path.GetFileNameWithoutExtension(path);
+                    string fileExtention = Path.GetExtension(path);
+                    string newFileName = fileNameWithoutExtention + fileExtention;
+
+                    int count = 1;
 
                     // copy the file if not exist already
-                    if (!File.Exists(fullTargetPath))
+                    while (File.Exists(fullTargetPath + newFileName))
                     {
-                        File.Move(path, fullTargetPath);
+                        string tmpFileName = string.Format("{0}({1})", fileNameWithoutExtention, count++);
+                        newFileName = tmpFileName + fileExtention;
                     }
-                    else
+
+                    if (!File.Exists(fullTargetPath + newFileName))
                     {
-                        result = false;
-                        return "file name already exist";
+                        File.Move(path, fullTargetPath + newFileName);
                     }
 
                     // create thumbnail if not exist already
-                    if (!File.Exists(fullTargetThumbnailsPath))
+                    if (!File.Exists(fullTargetThumbnailsPath + newFileName))
                     {
-                        using (Image image = Image.FromFile(fullTargetPath))
+                        using (Image image = Image.FromFile(fullTargetPath + newFileName))
                         using (Image thumbnail = image.GetThumbnailImage(this.m_thumbnailSize, this.m_thumbnailSize, () => false, IntPtr.Zero))
                         {
-                            thumbnail.Save(fullTargetThumbnailsPath);
+                            thumbnail.Save(fullTargetThumbnailsPath + newFileName);
                         }
                     }
 
