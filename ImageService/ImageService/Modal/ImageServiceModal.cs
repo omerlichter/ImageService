@@ -63,7 +63,8 @@ namespace ImageService.Modal
                 try
                 {
                     // create the output folder if is not already exist
-                    Directory.CreateDirectory(m_OutputFolder);
+                    DirectoryInfo di = Directory.CreateDirectory(m_OutputFolder);
+                    di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
 
                     string year = date.Year.ToString();
                     string month = date.Month.ToString();

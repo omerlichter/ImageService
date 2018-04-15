@@ -48,7 +48,6 @@ namespace ImageService.Controller.Handlers
             // add dirWatcher
             this.m_dirWatcher = new FileSystemWatcher(this.m_path);
             // add events
-            this.m_dirWatcher.Changed += new FileSystemEventHandler(DirectoryChanged);
             this.m_dirWatcher.Created += new FileSystemEventHandler(DirectoryChanged);
             this.m_dirWatcher.EnableRaisingEvents = true;
         }
