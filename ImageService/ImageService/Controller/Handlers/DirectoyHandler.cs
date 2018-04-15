@@ -45,11 +45,18 @@ namespace ImageService.Controller.Handlers
         public void StartHandleDirectory(string dirPath)
         {
             this.m_path = dirPath;
-            // add dirWatcher
-            this.m_dirWatcher = new FileSystemWatcher(this.m_path);
-            // add events
-            this.m_dirWatcher.Created += new FileSystemEventHandler(DirectoryChanged);
-            this.m_dirWatcher.EnableRaisingEvents = true;
+            try
+            {
+                // add dirWatcher
+                this.m_dirWatcher = new FileSystemWatcher(this.m_path);
+                // add events
+                this.m_dirWatcher.Created += new FileSystemEventHandler(DirectoryChanged);
+                this.m_dirWatcher.EnableRaisingEvents = true;
+            }
+            catch (Exception e)
+            {
+                m_logging.Log(e.Message, MessageTypeEnum.FAIL);
+            }
         }
 
         /// <summary>
