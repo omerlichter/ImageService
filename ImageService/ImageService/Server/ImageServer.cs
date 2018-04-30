@@ -1,4 +1,5 @@
 ﻿using ImageService.Controller;
+using ImageService.Server;
 using ImageService.Controller.Handlers;
 using ImageService.Infrastructure.Enums;
 using ImageService.Logging;
@@ -10,6 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 namespace ImageService.Server
 {
@@ -18,6 +22,10 @@ namespace ImageService.Server
         #region Members
         private IImageController m_controller;
         private ILoggingService m_logging;
+        //private TcpListener m_listener;
+        private int m_port;
+        private TcpListener m_listener;
+        private IClientHandler m_ch;
         #endregion
 
         #region Properties
@@ -29,10 +37,13 @@ namespace ImageService.Server
         /// </summary>
         /// <param name="controller">controller</param>
         /// <param name="logging">logger</param>
-        public ImageServer(IImageController controller, ILoggingService logging)
+        public ImageServer(IImageController controller, ILoggingService logging, int port)
         {
+            this.m_port = port;
+            this.m_ch = new ClientHandler;
             this.m_controller = controller;
             this.m_logging = logging;
+           
 
             // create handlers for all the directories
             string[] directories = ConfigurationManager.AppSettings.Get("Handler").Split(';');
@@ -42,10 +53,42 @@ namespace ImageService.Server
             }
         }
 
-        /// <summary>
-        /// craete handler to monitoring the directory path.
-        /// </summary>
-        /// <param name="directoryPath">path to the directory</param>
+        public void Start()
+        {
+            IPEndPoint ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), this.m_port);
+            this.m_listener = new TcpListener(ep);
+
+            this.m_listener.Start();
+            Console.WriteLine("Waiting for connections...");
+
+            Task task = new Task(() => {
+                while (true)
+                {
+                    try
+                    {
+                        TcpClient client = this.m_listener.AcceptTcpClient();
+                        Console.WriteLine("Got new connection");
+                        this.m_ch.HandleClient(client);
+                    }
+                    catch (SocketException)
+                    {
+                        break;
+                    }
+                }
+                Console.WriteLine("Server stopped");
+            });
+            task.Start();
+        }
+
+
+        public void Stop()
+        {
+            this.m_listener.Stop();
+        }
+    /// <summary>
+    /// craete handler to monitoring the directory path.
+    /// </summary>
+    /// <param name="directoryPath">path to the directory</param>
         public void CreateHandler(string directoryPath)
         {
             // create handler
