@@ -71,6 +71,7 @@ namespace ImageService.Controller.Handlers
             // if the command is close
             if (e.CommandID == (int)CommandEnum.CloseCommand)
             {
+                if (e.RequestDirPath == this.m_path || e.RequestDirPath == "*")
                 m_logging.Log("close command execute in handler", MessageTypeEnum.INFO);
                 EndHandler();
                 return;

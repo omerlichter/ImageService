@@ -112,7 +112,8 @@ namespace ImageService
             eventLog1.WriteEntry("In OnStart");
 
             // create image server
-            m_imageServer = new ImageServer(controller, logging);
+            m_imageServer = new ImageServer(controller, logging, 12345);
+            m_imageServer.Start();
 
             // Set up a timer to trigger every minute.  
             System.Timers.Timer timer = new System.Timers.Timer();
