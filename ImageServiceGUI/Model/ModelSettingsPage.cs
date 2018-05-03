@@ -69,6 +69,7 @@ namespace ImageServiceGUI.Model
             this.lbHandlers.Add("bla bla");
             this.lbHandlers.Add("gggg gggg");
             this.lbHandlers.Add("abc abc abc");
+            Console.WriteLine("bla");
             TCPClient client = TCPClient.Instance;
             bool a = client.StartCommunication();
             Console.WriteLine(a);
@@ -88,6 +89,7 @@ namespace ImageServiceGUI.Model
 
         public bool RemoveHandler(string handler)
         {
+            Console.WriteLine("remove handler " + handler);
             TCPClient client = TCPClient.Instance;
             string command = "2";
             client.WriteToServer(command);

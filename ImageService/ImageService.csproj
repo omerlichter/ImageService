@@ -55,24 +55,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageService\Commands\ICommand.cs" />
-    <Compile Include="ImageService\Commands\NewFileCommand.cs" />
-    <Compile Include="ImageService\Controller\Handlers\DirectoyHandler.cs" />
-    <Compile Include="ImageService\Controller\Handlers\IDirectoryHandler.cs" />
-    <Compile Include="ImageService\Controller\IImageController.cs" />
-    <Compile Include="ImageService\Controller\ImageController.cs" />
-    <Compile Include="ImageService\ImageService.cs">
+    <Compile Include="Commands\GetConfigCommand.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\NewFileCommand.cs" />
+    <Compile Include="Controller\Handlers\DirectoyHandler.cs" />
+    <Compile Include="Controller\Handlers\IDirectoryHandler.cs" />
+    <Compile Include="Controller\IImageController.cs" />
+    <Compile Include="Controller\ImageController.cs" />
+    <Compile Include="ImageService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ImageService\ImageService.Designer.cs">
+    <Compile Include="ImageService.Designer.cs">
       <DependentUpon>ImageService.cs</DependentUpon>
     </Compile>
-    <Compile Include="ImageService\Modal\Event\CommandRecievedEventArgs.cs" />
-    <Compile Include="ImageService\Modal\Event\DirectoryCloseEventArgs.cs" />
-    <Compile Include="ImageService\Modal\IImageServiceModal.cs" />
-    <Compile Include="ImageService\Modal\ImageServiceModal.cs" />
-    <Compile Include="ImageService\Server\ClientHandler.cs" />
-    <Compile Include="ImageService\Server\ImageServer.cs" />
+    <Compile Include="Modal\Event\CommandRecievedEventArgs.cs" />
+    <Compile Include="Modal\Event\DirectoryCloseEventArgs.cs" />
+    <Compile Include="Modal\IImageServiceModal.cs" />
+    <Compile Include="Modal\ImageServiceModal.cs" />
+    <Compile Include="Server\ClientHandler.cs" />
+    <Compile Include="Server\ImageServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -81,16 +82,16 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ImageService\Server\IClientHandler.cs" />
+    <Compile Include="Server\IClientHandler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ImageService\App.config">
+    <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ImageService\ImageService.resx">
+    <EmbeddedResource Include="ImageService.resx">
       <DependentUpon>ImageService.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">

@@ -25,8 +25,6 @@ namespace ImageService.Server
         private int m_port;
         private TcpListener m_listener;
         private IClientHandler m_ch;
-
-        private List<TcpClient> m_clientList;
         #endregion
 
         #region Properties
@@ -41,11 +39,11 @@ namespace ImageService.Server
         public ImageServer(IImageController controller, ILoggingService logging, int port)
         {
             this.m_port = port;
-            this.m_ch = new ClientHandler();
             this.m_controller = controller;
             this.m_logging = logging;
-            this.m_clientList = new List<TcpClient>();
-           
+            this.m_ch = new ClientHandler(logging);
+            this.m_logging.MessageRecieved += this.m_ch.SendLogToAllClients;
+
 
             // create handlers for all the directories
             string[] directories = ConfigurationManager.AppSettings.Get("Handler").Split(';');

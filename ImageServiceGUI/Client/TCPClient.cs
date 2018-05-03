@@ -54,6 +54,7 @@ namespace ImageServiceGUI.Client
         {
             try
             {
+                Console.WriteLine("write to server...");
                 this.writer.Write(str);
             } catch(Exception e)
             {
