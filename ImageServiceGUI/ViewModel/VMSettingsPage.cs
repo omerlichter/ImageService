@@ -65,8 +65,8 @@ namespace ImageServiceGUI.ViewModel
             model.PropertyChanged += delegate (Object sender, PropertyChangedEventArgs e) {
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
-            this.model.GetSettingsFromService();
             this.RemoveCommand = new DelegateCommand<object>(this.OnRemove, this.CanRemove);
+            this.model.GetSettingsFromService();
         }
 
         private void OnRemove(object obj)

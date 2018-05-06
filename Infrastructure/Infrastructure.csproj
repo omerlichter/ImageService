@@ -40,8 +40,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Communication\ConfigData.cs" />
+    <Compile Include="Communication\LogData.cs" />
+    <Compile Include="Communication\LogItem.cs" />
+    <Compile Include="Communication\MessageInfo.cs" />
     <Compile Include="Enums\CommandEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{f8dc96eb-8715-4094-91b4-f6eeea83152b}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -113,7 +113,6 @@ namespace ImageService
 
             // create image server
             m_imageServer = new ImageServer(controller, logging, 12345);
-            m_imageServer.Start();
 
             // Set up a timer to trigger every minute.  
             System.Timers.Timer timer = new System.Timers.Timer();
@@ -135,7 +134,7 @@ namespace ImageService
         {
             // get the type of the message
             EventLogEntryType type;
-            switch(e.Status)
+            switch (e.Status)
             {
                 case MessageTypeEnum.WARNING: type = EventLogEntryType.Warning; break;
                 case MessageTypeEnum.FAIL: type = EventLogEntryType.Error; break;

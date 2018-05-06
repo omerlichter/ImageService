@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -58,7 +62,10 @@
     <Compile Include="Client\TCPClient.cs" />
     <Compile Include="CommandBinding\DelegateCommand.cs" />
     <Compile Include="Convertor\ConnectionToBackgroundConvertor.cs" />
+    <Compile Include="Model\IModelLogPage.cs" />
     <Compile Include="Model\IModelSettingsPage.cs" />
+    <Compile Include="Model\ModelLogPage.cs" />
+    <Compile Include="ViewModel\IVMLogPage.cs" />
     <Compile Include="ViewModel\IVMSettingsPage.cs" />
     <Compile Include="controls\LogsPage.xaml.cs">
       <DependentUpon>LogsPage.xaml</DependentUpon>
@@ -79,6 +86,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModel\VMLogPage.cs" />
     <Compile Include="ViewModel\VMSettingsPage.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -107,6 +115,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -116,7 +125,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
+      <Project>{f41c49e6-11e8-4bc9-b2a8-b41d8e35219e}</Project>
+      <Name>Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{f8dc96eb-8715-4094-91b4-f6eeea83152b}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

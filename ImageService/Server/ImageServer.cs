@@ -21,10 +21,7 @@ namespace ImageService.Server
         #region Members
         private IImageController m_controller;
         private ILoggingService m_logging;
-        //private TcpListener m_listener;
-        private int m_port;
-        private TcpListener m_listener;
-        private IClientHandler m_ch;
+        private CommunicationServer m_communicationServer;
         #endregion
 
         #region Properties
@@ -38,12 +35,10 @@ namespace ImageService.Server
         /// <param name="logging">logger</param>
         public ImageServer(IImageController controller, ILoggingService logging, int port)
         {
-            this.m_port = port;
             this.m_controller = controller;
             this.m_logging = logging;
-            this.m_ch = new ClientHandler(logging);
-            this.m_logging.MessageRecieved += this.m_ch.SendLogToAllClients;
-
+            this.m_communicationServer = new CommunicationServer(this, this.m_controller, this.m_logging, 12345);
+            this.m_communicationServer.Start();
 
             // create handlers for all the directories
             string[] directories = ConfigurationManager.AppSettings.Get("Handler").Split(';');
@@ -53,32 +48,6 @@ namespace ImageService.Server
             }
         }
 
-        public void Start()
-        {
-            IPEndPoint ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), this.m_port);
-            this.m_listener = new TcpListener(ep);
-
-            this.m_listener.Start();
-            this.m_logging.Log("Waiting for connections...", MessageTypeEnum.INFO);
-
-            Task task = new Task(() => {
-                while (true)
-                {
-                    try
-                    {
-                        TcpClient client = this.m_listener.AcceptTcpClient();
-                        this.m_logging.Log("Client Connected", MessageTypeEnum.INFO);
-                        this.m_ch.HandleClient(client);
-                    }
-                    catch (SocketException e)
-                    {
-                        this.m_logging.Log(e.Message, MessageTypeEnum.FAIL);
-                    }
-                }
-                this.m_logging.Log("Server stopped", MessageTypeEnum.INFO);
-            });
-            task.Start();
-        }
     /// <summary>
     /// craete handler to monitoring the directory path.
     /// </summary>
@@ -121,7 +90,6 @@ namespace ImageService.Server
         /// </summary>
         public void CloseServer()
         {
-            this.m_listener.Stop();
             CommandRecievedEventArgs commandArgs = new CommandRecievedEventArgs((int)CommandEnum.CloseCommand, null, "*");
             SendCommand(commandArgs);
         }

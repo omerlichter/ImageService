@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageService.Infrastructure;
 using ImageService.Infrastructure.Enums;
 using ImageService.Logging;
 using ImageService.Logging.Modal;
@@ -68,28 +67,29 @@ namespace ImageService.Controller.Handlers
         {
             bool resultSuccesful;
 
-            // if the command is close
-            if (e.CommandID == (int)CommandEnum.CloseCommand)
+            if (e.RequestDirPath == this.m_path || e.RequestDirPath == "*")
             {
-                if (e.RequestDirPath == this.m_path || e.RequestDirPath == "*")
-                m_logging.Log("close command execute in handler", MessageTypeEnum.INFO);
-                EndHandler();
-                return;
-            }
-
-            // if is other command
-            if (e.RequestDirPath.Equals(this.m_path))
-            {
-                string msg = m_controller.ExecuteCommand(e.CommandID, e.Args, out resultSuccesful);
-                if (resultSuccesful == false)
+                // if the command is close
+                if (e.CommandID == (int)CommandEnum.CloseCommand)
                 {
-                    // fail
-                    m_logging.Log("error on execute command: " + msg, MessageTypeEnum.FAIL);
+
+                    m_logging.Log("close command execute in handler", MessageTypeEnum.INFO);
+                    EndHandler();
+                    return;
                 }
                 else
                 {
-                    // succeed
-                    m_logging.Log("the command with ID: " + e.CommandID + " execute successfully", MessageTypeEnum.INFO);
+                    string msg = m_controller.ExecuteCommand(e.CommandID, e.Args, out resultSuccesful);
+                    if (resultSuccesful == false)
+                    {
+                        // fail
+                        m_logging.Log("error on execute command with ID: " + Enum.GetName(typeof(CommandEnum), e.CommandID) + ", message: " + msg, MessageTypeEnum.FAIL);
+                    }
+                    else
+                    {
+                        // succeed
+                        m_logging.Log("the command with ID: " + Enum.GetName(typeof(CommandEnum), e.CommandID) + " execute successfully", MessageTypeEnum.INFO);
+                    }
                 }
             }
         }

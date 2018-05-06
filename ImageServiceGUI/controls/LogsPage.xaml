@@ -6,7 +6,17 @@
              xmlns:local="clr-namespace:ImageServiceGUI.controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <StackPanel Orientation="Vertical">
         <Label>In Logs Page</Label>
-    </Grid>
+        <ItemsControl Name="lbLogs" Grid.Row="1" ItemsSource="{Binding VM_LogsList}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="5" Text="{Binding Path=LogType}"/>
+                        <TextBlock Margin="5" Text="{Binding Path=LogMessage}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
 </UserControl>

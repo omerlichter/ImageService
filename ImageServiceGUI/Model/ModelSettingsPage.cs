@@ -8,7 +8,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using ImageServiceGUI.Client;
+using ImageService.Infrastructure.Enums;
+using ImageService.Infrastructure.Communication;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
+using System.Windows;
 
 namespace ImageServiceGUI.Model
 {
@@ -66,15 +70,11 @@ namespace ImageServiceGUI.Model
 
         public ModelSettingsPage()
         {
-            this.lbHandlers.Add("bla bla");
-            this.lbHandlers.Add("gggg gggg");
-            this.lbHandlers.Add("abc abc abc");
-            Console.WriteLine("bla");
             TCPClient client = TCPClient.Instance;
-            bool a = client.StartCommunication();
-            Console.WriteLine(a);
+            client.MessageReceived += GetMessageFromClient;
+            this.serverConnection = client.StartCommunication();
+            Console.WriteLine(this.ServerConnection);
         }
-
 
         public void NotifyPropertyChanged(string propName) {
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
@@ -83,7 +83,8 @@ namespace ImageServiceGUI.Model
         public void GetSettingsFromService()
         {
             TCPClient client = TCPClient.Instance;
-            string command = "1";
+            MessageInfo info = new MessageInfo(CommandEnum.GetConfigCommand, null);
+            string command = JsonConvert.SerializeObject(info);
             client.WriteToServer(command);
         }
 
@@ -91,9 +92,52 @@ namespace ImageServiceGUI.Model
         {
             Console.WriteLine("remove handler " + handler);
             TCPClient client = TCPClient.Instance;
-            string command = "2";
+            MessageInfo info = new MessageInfo(CommandEnum.CloseCommand, handler);
+            string command = JsonConvert.SerializeObject(info);
             client.WriteToServer(command);
             return true;
+        }
+
+        public void GetMessageFromClient(object sender, MessageInfo info)
+        {
+            if (info.ID == CommandEnum.GetConfigCommand)
+            {
+                try
+                {
+                    Console.WriteLine(info.Args);
+                    ConfigData configData = JsonConvert.DeserializeObject<ConfigData>(info.Args);
+
+                    Application.Current.Dispatcher.Invoke(new Action(() => 
+                    {
+                        this.OutputDirectory = configData.OutputDir;
+                        this.SourceName = configData.SourceName;
+                        this.LogName = configData.LogName;
+                        this.ThumbnailSize = configData.ThumbnailSize;
+                        foreach (string handler in configData.Handlers)
+                        {
+                            this.lbHandlers.Add(handler);
+                        }
+                    }));
+                } catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            if (info.ID == CommandEnum.CloseCommand)
+            {
+                try
+                {
+                    string closedHandler = info.Args;
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        this.lbHandlers.Remove(closedHandler);
+                    }));              
+                } catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
         }
     }
 }

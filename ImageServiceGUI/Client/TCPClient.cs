@@ -6,15 +6,18 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using ImageService.Infrastructure.Communication;
 
 namespace ImageServiceGUI.Client
 {
     class TCPClient
     {
-        public event EventHandler<string> MessageReceived;
+        public event EventHandler<MessageInfo> MessageReceived;
 
         private static readonly TCPClient instance = new TCPClient();
 
+        private TcpClient client;
         private NetworkStream stream;
         private BinaryReader reader;
         private BinaryWriter writer;
@@ -33,9 +36,8 @@ namespace ImageServiceGUI.Client
             try
             {
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 12345);
-                TcpClient client = new TcpClient();
+                this.client = new TcpClient();
                 client.Connect(ep);
-
                 this.stream = client.GetStream();
                 this.reader = new BinaryReader(stream);
                 this.writer = new BinaryWriter(stream);
@@ -55,7 +57,7 @@ namespace ImageServiceGUI.Client
             try
             {
                 Console.WriteLine("write to server...");
-                this.writer.Write(str);
+                writer.Write(str);
             } catch(Exception e)
             {
                 Console.WriteLine(e.Message);
@@ -66,20 +68,26 @@ namespace ImageServiceGUI.Client
         {
             new Task(() =>
             {
-                while (!endCommunication)
+                try
                 {
-                    try
+                    while (!endCommunication)
                     {
-                        Console.WriteLine("start reading from server...");
-                        string message = this.reader.ReadString();
-                        Console.WriteLine("end reading");
-                        this.MessageReceived?.Invoke(this, message);
+                        try
+                        {
+                            string message = reader.ReadString();
+                            Console.WriteLine("reading from server: " + message);
+                            MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(message);
+                            this.MessageReceived?.Invoke(this, info);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            break;
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        break;
-                    }
+                } catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
                 }
             }).Start();
         }
@@ -87,9 +95,10 @@ namespace ImageServiceGUI.Client
         public void CloseCommunication()
         {
             endCommunication = true;
-            this.stream.Close();
-            this.reader.Close();
             this.writer.Close();
+            this.reader.Close();
+            this.stream.Close();
+            this.client.Close();
         }
     }
 }

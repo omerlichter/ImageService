@@ -7,18 +7,30 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageService.Logging.Modal;
 using ImageService.Logging;
+using Newtonsoft.Json;
+using ImageService.Infrastructure.Communication;
+using ImageService.Infrastructure.Enums;
+using ImageService.Controller;
+using ImageService.Modal;
+using System.Threading;
 
 namespace ImageService.Server
 {
     class ClientHandler : IClientHandler
     {
-        private ILoggingService m_logging;
-        private List<TcpClient> m_clientList;
+        private static Mutex writerMut = new Mutex();
 
-        public ClientHandler(ILoggingService logging)
+        private ILoggingService m_logging;
+        private ImageServer m_imageServer;
+        private IImageController m_controller;
+        private List<TcpClientInfo> m_clientList;
+
+        public ClientHandler(ILoggingService logging, ImageServer imageServer, IImageController controller)
         {
             this.m_logging = logging;
-            this.m_clientList = new List<TcpClient>();
+            this.m_imageServer = imageServer;
+            this.m_controller = controller;
+            this.m_clientList = new List<TcpClientInfo>();
         }
 
 
@@ -26,24 +38,63 @@ namespace ImageService.Server
         {
             new Task(() =>
             {
-                this.m_clientList.Add(client);
+                NetworkStream stream = client.GetStream();
+                BinaryReader reader = new BinaryReader(stream);
+                BinaryWriter writer = new BinaryWriter(stream);
+                TcpClientInfo clientInfo = new TcpClientInfo(client, stream, reader, writer);
+                this.m_clientList.Add(clientInfo);
                 bool clientConnect = true;
 
-                while(clientConnect)
+                try
                 {
-                    using (NetworkStream stream = client.GetStream())
-                    using (StreamReader reader = new StreamReader(stream))
-                    using (StreamWriter writer = new StreamWriter(stream))
+                    while (clientConnect)
                     {
-                        this.m_logging.Log("wait for command from client", MessageTypeEnum.INFO);
-                        string commandLine = reader.ReadLine();
-                        //Console.WriteLine("Got command: {0}", commandLine);
-                        this.m_logging.Log(commandLine, MessageTypeEnum.INFO);
-                        writer.Write("recive!");
+                        this.m_logging.Log("num of connected clients: " + this.m_clientList.Count, MessageTypeEnum.INFO);
+                        string commandLine = reader.ReadString();
+                        MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(commandLine);
+
+                        if (info.ID == CommandEnum.CloseCommand)
+                        {
+                            CommandRecievedEventArgs command = new CommandRecievedEventArgs((int)info.ID, null, info.Args);
+                            this.m_imageServer.SendCommand(command);
+
+                            // send back
+                            MessageInfo messageBack = new MessageInfo(CommandEnum.CloseCommand, info.Args);
+                            string messageBackString = JsonConvert.SerializeObject(messageBack);
+                            writerMut.WaitOne();
+                            writer.Write(messageBackString);
+                            writerMut.ReleaseMutex();
+                        }
+                        else
+                        {
+                            bool result;
+                            string[] executeArgs = { info.Args };
+                            string value = this.m_controller.ExecuteCommand((int)info.ID, executeArgs, out result);
+
+                            // send back
+                            MessageInfo messageBack = null;
+                            if (result)
+                            {
+                                messageBack = new MessageInfo(info.ID, value);
+                            }
+                            else
+                            {
+                                messageBack = new MessageInfo(CommandEnum.FailCommand, null);
+                            }
+                            string messageBackString = JsonConvert.SerializeObject(messageBack);
+                            writerMut.WaitOne();
+                            writer.Write(messageBackString);
+                            writerMut.ReleaseMutex();
+                        }
                     }
+                } catch(Exception e)
+                {
+                    client.Close();
+                    this.m_clientList.Remove(clientInfo);
+                    return;
                 }
                 client.Close();
-                this.m_clientList.Remove(client);
+                this.m_clientList.Remove(clientInfo);
             }).Start();
         }
 
@@ -51,13 +102,24 @@ namespace ImageService.Server
         {
             new Task(() =>
             {
-                foreach (TcpClient client in this.m_clientList)
+                LogItem logItem = new LogItem(args.Status, args.Message);
+                List<LogItem> logList = new List<LogItem>();
+                logList.Add(logItem);
+                LogData logData = new LogData(logList);
+                string serializeArgs = JsonConvert.SerializeObject(logData);
+                MessageInfo info = new MessageInfo(CommandEnum.LogCommand, serializeArgs);
+                string message = JsonConvert.SerializeObject(info);
+
+                foreach (TcpClientInfo clientInfo in this.m_clientList)
                 {
-                    using (NetworkStream stream = client.GetStream())
-                    using (StreamWriter writer = new StreamWriter(stream))
+                    try
                     {
-                        string message = "2," + args.Message + "," + args.Status;
-                        writer.WriteLine(message);
+                        writerMut.WaitOne();
+                        clientInfo.Writer.Write(message);
+                        writerMut.ReleaseMutex();
+                    } catch(Exception e)
+                    {
+                        this.m_clientList.Remove(clientInfo);
                     }
                 }
             }).Start();
