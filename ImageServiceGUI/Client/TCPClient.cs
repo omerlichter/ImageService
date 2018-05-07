@@ -15,7 +15,7 @@ namespace ImageServiceGUI.Client
     {
         public event EventHandler<MessageInfo> MessageReceived;
 
-        private static readonly TCPClient instance = new TCPClient();
+        private static TCPClient instance;
 
         private TcpClient client;
         private NetworkStream stream;
@@ -23,15 +23,27 @@ namespace ImageServiceGUI.Client
         private BinaryWriter writer;
 
         private bool endCommunication;
+        private bool isConnect;
 
-        private TCPClient() { }
+        private TCPClient() {
+            this.isConnect = StartCommunication();
+        }
 
         public static TCPClient Instance
         {
-            get { return instance; }
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new TCPClient();
+                }
+                return instance;
+            }
         }
 
-        public bool StartCommunication()
+        public bool Connect { get { return this.isConnect; } }
+
+        private bool StartCommunication()
         {
             try
             {
@@ -47,6 +59,7 @@ namespace ImageServiceGUI.Client
                 Console.WriteLine(e.Message);
                 return false;
             }
+            isConnect = true;
             endCommunication = false;
             ReadFromServer();
             return true;
@@ -68,26 +81,27 @@ namespace ImageServiceGUI.Client
         {
             new Task(() =>
             {
-                try
+                while (!endCommunication)
                 {
-                    while (!endCommunication)
+                    try
                     {
-                        try
+                        string message = reader.ReadString();
+                        Console.WriteLine("reading from server: " + message);
+
+                        if (string.Compare(message, "close") == 0)
                         {
-                            string message = reader.ReadString();
-                            Console.WriteLine("reading from server: " + message);
-                            MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(message);
-                            this.MessageReceived?.Invoke(this, info);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
+                            CloseCommunication();
                             break;
                         }
+
+                        MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(message);
+                        this.MessageReceived?.Invoke(this, info);
                     }
-                } catch(Exception e)
-                {
-                    Console.WriteLine(e.Message);
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        break;
+                    }
                 }
             }).Start();
         }

@@ -72,8 +72,6 @@ namespace ImageServiceGUI.Model
         {
             TCPClient client = TCPClient.Instance;
             client.MessageReceived += GetMessageFromClient;
-            this.serverConnection = client.StartCommunication();
-            Console.WriteLine(this.ServerConnection);
         }
 
         public void NotifyPropertyChanged(string propName) {

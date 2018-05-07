@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 using ImageService.Logging.Modal;
 using ImageService.Logging;
 using Newtonsoft.Json;
@@ -44,26 +45,34 @@ namespace ImageService.Server
                 TcpClientInfo clientInfo = new TcpClientInfo(client, stream, reader, writer);
                 this.m_clientList.Add(clientInfo);
                 bool clientConnect = true;
+                this.m_logging.Log("num of connected clients: " + this.m_clientList.Count, MessageTypeEnum.INFO);
 
                 try
                 {
                     while (clientConnect)
                     {
-                        this.m_logging.Log("num of connected clients: " + this.m_clientList.Count, MessageTypeEnum.INFO);
                         string commandLine = reader.ReadString();
                         MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(commandLine);
 
                         if (info.ID == CommandEnum.CloseCommand)
                         {
-                            CommandRecievedEventArgs command = new CommandRecievedEventArgs((int)info.ID, null, info.Args);
-                            this.m_imageServer.SendCommand(command);
+                            bool result;
+                            string[] executeArgs = { info.Args };
+                            string value = this.m_controller.ExecuteCommand((int)info.ID, executeArgs, out result);
+
 
                             // send back
-                            MessageInfo messageBack = new MessageInfo(CommandEnum.CloseCommand, info.Args);
+                            MessageInfo messageBack = null;
+                            if (result)
+                            {
+                                messageBack = new MessageInfo(info.ID, value);
+                            }
+                            else
+                            {
+                                messageBack = new MessageInfo(CommandEnum.FailCommand, null);
+                            }
                             string messageBackString = JsonConvert.SerializeObject(messageBack);
-                            writerMut.WaitOne();
-                            writer.Write(messageBackString);
-                            writerMut.ReleaseMutex();
+                            this.SendMessageToAllClients(messageBackString);
                         }
                         else
                         {
@@ -118,6 +127,26 @@ namespace ImageService.Server
                         clientInfo.Writer.Write(message);
                         writerMut.ReleaseMutex();
                     } catch(Exception e)
+                    {
+                        this.m_clientList.Remove(clientInfo);
+                    }
+                }
+            }).Start();
+        }
+
+        public void SendMessageToAllClients(string message)
+        {
+            new Task(() =>
+            {
+                foreach (TcpClientInfo clientInfo in this.m_clientList)
+                {
+                    try
+                    {
+                        writerMut.WaitOne();
+                        clientInfo.Writer.Write(message);
+                        writerMut.ReleaseMutex();
+                    }
+                    catch (Exception e)
                     {
                         this.m_clientList.Remove(clientInfo);
                     }

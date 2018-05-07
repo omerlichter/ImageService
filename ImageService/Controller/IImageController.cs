@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageService.Server;
 
 namespace ImageService.Controller
 {
@@ -16,5 +17,6 @@ namespace ImageService.Controller
         /// <param name="resultSuccesful">return if the execute succeed</param>
         /// <returns>return the comand return if succeed, return exception else</returns>
         string ExecuteCommand(int commandID, string[] args, out bool result);          // Executing the Command Requet
+        void SetCloseCommand(ImageServer imageServer);
     }
 }

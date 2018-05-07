@@ -85,15 +85,17 @@ namespace ImageService
             eventLog1.Source = eventSourceName;
             eventLog1.Log = logName;
            
-            // create logger
+            // create logger and logger history
             logging = new LoggingService();
+            ILoggingHistory loggingHistory = new LoggingHistory();
             logging.MessageRecieved += eventLogMessage;
+            logging.MessageRecieved += loggingHistory.AddLog;
 
             // create image service model
             modal = new ImageServiceModal(outputFolder, thumbnailSize);
 
             // create image controller
-            controller = new ImageController(modal);
+            controller = new ImageController(modal, loggingHistory);
         }
 
         /// <summary>
@@ -109,10 +111,11 @@ namespace ImageService
             SetServiceStatus(this.ServiceHandle, ref serviceStatus);
 
             // write start to event log
-            eventLog1.WriteEntry("In OnStart");
+            this.logging.Log("In OnStart", MessageTypeEnum.INFO);
 
             // create image server
             m_imageServer = new ImageServer(controller, logging, 12345);
+            this.controller.SetCloseCommand(this.m_imageServer);
 
             // Set up a timer to trigger every minute.  
             System.Timers.Timer timer = new System.Timers.Timer();
@@ -150,7 +153,7 @@ namespace ImageService
         protected override void OnContinue()
         {
             // write continue to event log
-            eventLog1.WriteEntry("In OnContinue.");
+            this.logging.Log("In OnContinue", MessageTypeEnum.INFO);
         }
 
         /// <summary>
@@ -165,7 +168,7 @@ namespace ImageService
             SetServiceStatus(this.ServiceHandle, ref serviceStatus);
 
             // write stop to event log
-            eventLog1.WriteEntry("In onStop.");
+            this.logging.Log("In OnStop", MessageTypeEnum.INFO);
 
             // close the server
             this.m_imageServer.CloseServer();

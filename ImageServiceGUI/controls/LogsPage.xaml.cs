@@ -22,13 +22,10 @@ namespace ImageServiceGUI.controls
     /// </summary>
     public partial class LogsPage : UserControl
     {
-        private IVMLogPage vm_logPage;
-
         public LogsPage()
         {
-            InitializeComponent();
-            this.vm_logPage = new VMLogPage(new ModelLogPage());
-            this.DataContext = this.vm_logPage;
+            InitializeComponent(); 
+            this.DataContext = new VMLogPage();
         }
     }
 }

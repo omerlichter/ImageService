@@ -14,5 +14,7 @@ namespace ImageServiceGUI.Model
     interface IModelLogPage : INotifyPropertyChanged
     {
         ObservableCollection<LogItem> LogsList { get; set; }
+
+        void GetLogsHistoryFromService();
     }
 }

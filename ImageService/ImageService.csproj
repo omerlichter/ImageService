@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\CloseCommand.cs" />
     <Compile Include="Commands\GetConfigCommand.cs" />
     <Compile Include="Commands\GetLogHistoryCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />

@@ -61,10 +61,13 @@
     </ApplicationDefinition>
     <Compile Include="Client\TCPClient.cs" />
     <Compile Include="CommandBinding\DelegateCommand.cs" />
-    <Compile Include="Convertor\ConnectionToBackgroundConvertor.cs" />
+    <Compile Include="controls\Convertor\ConnectionToBackgroundConvertor.cs" />
+    <Compile Include="controls\Convertor\LogStatusToColorConvertor.cs" />
     <Compile Include="Model\IModelLogPage.cs" />
     <Compile Include="Model\IModelSettingsPage.cs" />
+    <Compile Include="Model\IModelWindow.cs" />
     <Compile Include="Model\ModelLogPage.cs" />
+    <Compile Include="Model\ModelWindow.cs" />
     <Compile Include="ViewModel\IVMLogPage.cs" />
     <Compile Include="ViewModel\IVMSettingsPage.cs" />
     <Compile Include="controls\LogsPage.xaml.cs">
@@ -74,6 +77,7 @@
     <Compile Include="controls\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\VMWindow.cs" />
     <Page Include="controls\LogsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -86,6 +90,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModel\IVMWindow.cs" />
     <Compile Include="ViewModel\VMLogPage.cs" />
     <Compile Include="ViewModel\VMSettingsPage.cs" />
     <Compile Include="MainWindow.xaml.cs">

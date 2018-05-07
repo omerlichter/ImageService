@@ -63,6 +63,7 @@ namespace ImageService.Server
 
         public void CloseCommunication()
         {
+            this.m_ch.SendMessageToAllClients("close");
             this.closeCommunication = true;
             this.m_listener.Stop();
         }

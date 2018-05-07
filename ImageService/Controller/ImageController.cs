@@ -1,6 +1,8 @@
 ﻿using ImageService.Commands;
 using ImageService.Infrastructure.Enums;
 using ImageService.Modal;
+using ImageService.Logging;
+using ImageService.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +22,15 @@ namespace ImageService.Controller
         /// constructor.
         /// </summary>
         /// <param name="modal">modal</param>
-        public ImageController(IImageServiceModal modal)
+        public ImageController(IImageServiceModal modal, ILoggingHistory loggingHistory)
         {
             m_modal = modal;                    // Storing the Modal Of The System
             commands = new Dictionary<int, ICommand>()
             {
                 // For Now will contain NEW_FILE_COMMAND
                 {(int)CommandEnum.NewFileCommand, new NewFileCommand(m_modal)},
-                {(int)CommandEnum.GetConfigCommand, new GetConfigCommand()}
+                {(int)CommandEnum.GetConfigCommand, new GetConfigCommand()},
+                {(int)CommandEnum.LogCommand, new GetLogHistoryCommand(loggingHistory) }
             };
         }
 
@@ -46,6 +49,11 @@ namespace ImageService.Controller
             }
             resultSuccesful = false;
             return "error: the command ID not exist";
+        }
+
+        public void SetCloseCommand(ImageServer imageServer)
+        {
+            commands.Add((int)CommandEnum.CloseCommand, new CloseCommand(imageServer));
         }
     }
 }

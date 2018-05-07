@@ -7,21 +7,26 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace ImageServiceGUI.Convertor
+namespace ImageServiceGUI.controls.Convertor
 {
-    class ConnectionToBackgroundConvertor : IValueConverter
+    class LogStatusToColorConvertor : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
             if (targetType != typeof(Brush))
             {
                 throw new InvalidOperationException("Must convert to a brush!");
             }
-            bool connected = (bool)value;
-            if (connected)
+            string status = value.ToString();
+            object brush;
+            switch(status)
             {
-                return Brushes.White;
+                case "INFO": brush = Brushes.GreenYellow; break;
+                case "FAIL": brush = Brushes.Red; break;
+                case "WARNING": brush = Brushes.Yellow; break;
+                default: brush = Brushes.Gray; break;
             }
-            return Brushes.Gray;
+            return brush;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

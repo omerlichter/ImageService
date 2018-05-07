@@ -51,6 +51,7 @@ namespace ImageService.Controller.Handlers
                 // add events
                 this.m_dirWatcher.Created += new FileSystemEventHandler(DirectoryChanged);
                 this.m_dirWatcher.EnableRaisingEvents = true;
+                m_logging.Log("start handle directory " + dirPath, MessageTypeEnum.INFO);
             }
             catch (Exception e)
             {
@@ -124,14 +125,12 @@ namespace ImageService.Controller.Handlers
                 this.m_dirWatcher.EnableRaisingEvents = false;
                 this.m_dirWatcher.Created -= new FileSystemEventHandler(DirectoryChanged);
                 this.m_dirWatcher.Changed -= new FileSystemEventHandler(DirectoryChanged);
+                DirectoryCloseEventArgs closeArgs = new DirectoryCloseEventArgs(this.m_path, "directory " + this.m_path + " closed");
+                DirectoryClose?.Invoke(this, closeArgs);
             } catch (Exception e)
             {
                 m_logging.Log(e.Message, MessageTypeEnum.FAIL);
             }
-
-            DirectoryCloseEventArgs closeArgs = new DirectoryCloseEventArgs(this.m_path, "directory " + this.m_path + "closed");
-
-            DirectoryClose?.Invoke(this, closeArgs);
         }
     }
 }

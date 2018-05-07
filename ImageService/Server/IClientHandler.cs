@@ -8,5 +8,6 @@ namespace ImageService.Server
         void HandleClient(TcpClient client);
 
         void SendLogToAllClients(object sender, MessageRecievedEventArgs args);
+        void SendMessageToAllClients(string message);
     }
 }

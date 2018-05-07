@@ -33,12 +33,13 @@ namespace ImageServiceGUI.ViewModel
             get { return this.selectedItem; }
         }
 
-        public VMLogPage(IModelLogPage model)
+        public VMLogPage()
         {
-            this.model = model;
+            this.model = new ModelLogPage();
             model.PropertyChanged += delegate (Object sender, PropertyChangedEventArgs e) {
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
+            this.model.GetLogsHistoryFromService();
         }
 
         public void NotifyPropertyChanged(string propName)

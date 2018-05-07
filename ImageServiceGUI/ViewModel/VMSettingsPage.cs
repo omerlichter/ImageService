@@ -59,9 +59,9 @@ namespace ImageServiceGUI.ViewModel
             get { return this.selectedItem; }
         }
 
-        public VMSettingsPage(IModelSettingsPage model)
+        public VMSettingsPage()
         {
-            this.model = model;
+            this.model = new ModelSettingsPage();
             model.PropertyChanged += delegate (Object sender, PropertyChangedEventArgs e) {
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };

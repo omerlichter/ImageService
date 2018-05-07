@@ -40,7 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILoggingHistory.cs" />
     <Compile Include="ILoggingService.cs" />
+    <Compile Include="LoggingHistory.cs" />
     <Compile Include="LoggingService.cs" />
     <Compile Include="Modal\MessageRecievedEventArgs.cs" />
     <Compile Include="Modal\MessageTypeEnum.cs" />

@@ -26,8 +26,9 @@ namespace ImageService.Server
 
         #region Properties
         public event EventHandler<CommandRecievedEventArgs> CommandRecieved;          // The event that notifies about a new Command being recieved
+        public event EventHandler ServerClosed;
         #endregion
-        
+
         /// <summary>
         /// constructor, create handlers for all the directoris in the config file.
         /// </summary>
