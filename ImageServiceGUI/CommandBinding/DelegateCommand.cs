@@ -21,16 +21,28 @@ namespace ImageServiceGUI.CommandBinding
             this.canExecuteMethod = canExecuteMethod;
         }
 
+        /// <summary>
+        /// cand execute the function
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>true if can</returns>
         public bool CanExecute(object obj)
         {
             return this.canExecuteMethod(obj);
         }
 
+        /// <summary>
+        /// execute the function
+        /// </summary>
+        /// <param name="obj"></param>
         public void Execute(object obj)
         {
             this.executeMethod(obj);
         }
 
+        /// <summary>
+        /// raise event
+        /// </summary>
         public void RaiseCanExecuteChange()
         {
             this.CanExecuteChanged?.Invoke(this, new EventArgs());

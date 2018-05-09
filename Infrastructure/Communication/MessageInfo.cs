@@ -12,6 +12,11 @@ namespace ImageService.Infrastructure.Communication
         public string Args { get; set; }
         public CommandEnum ID { get; set; }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="args"></param>
         public MessageInfo(CommandEnum id, string args)
         {
             this.Args = args;

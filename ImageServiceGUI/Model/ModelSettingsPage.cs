@@ -68,16 +68,26 @@ namespace ImageServiceGUI.Model
             get { return this.lbHandlers; }
         }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public ModelSettingsPage()
         {
             TCPClient client = TCPClient.Instance;
             client.MessageReceived += GetMessageFromClient;
         }
 
+        /// <summary>
+        /// notify that property changed
+        /// </summary>
+        /// <param name="propName"></param>
         public void NotifyPropertyChanged(string propName) {
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
+        /// <summary>
+        /// send to server to get settings
+        /// </summary>
         public void GetSettingsFromService()
         {
             TCPClient client = TCPClient.Instance;
@@ -86,6 +96,11 @@ namespace ImageServiceGUI.Model
             client.WriteToServer(command);
         }
 
+        /// <summary>
+        /// sned server to remove handler
+        /// </summary>
+        /// <param name="handler">path</param>
+        /// <returns>true if remove</returns>
         public bool RemoveHandler(string handler)
         {
             Console.WriteLine("remove handler " + handler);
@@ -96,8 +111,14 @@ namespace ImageServiceGUI.Model
             return true;
         }
 
+        /// <summary>
+        /// get message from the server by the client class
+        /// </summary>
+        /// <param name="sender">sender of the message</param>
+        /// <param name="info">message info</param>
         public void GetMessageFromClient(object sender, MessageInfo info)
         {
+            // if the command is getConfig
             if (info.ID == CommandEnum.GetConfigCommand)
             {
                 try
@@ -122,6 +143,7 @@ namespace ImageServiceGUI.Model
                 }
             }
 
+            // if the command is close
             if (info.ID == CommandEnum.CloseCommand)
             {
                 try

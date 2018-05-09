@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ImageService.Infrastructure.Communication;
+using ImageService.Infrastructure.Enums;
 
 namespace ImageServiceGUI.Client
 {
@@ -25,9 +26,7 @@ namespace ImageServiceGUI.Client
         private bool endCommunication;
         private bool isConnect;
 
-        private TCPClient() {
-            this.isConnect = StartCommunication();
-        }
+        public bool Connect { get { return this.isConnect; } }
 
         public static TCPClient Instance
         {
@@ -41,14 +40,25 @@ namespace ImageServiceGUI.Client
             }
         }
 
-        public bool Connect { get { return this.isConnect; } }
+        /// <summary>
+        /// constructor
+        /// </summary>
+        private TCPClient() {
+            this.isConnect = StartCommunication();
+        }
 
+        /// <summary>
+        /// start communication with server
+        /// </summary>
+        /// <returns>true if connect</returns>
         private bool StartCommunication()
         {
             try
             {
+                // set
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 12345);
                 this.client = new TcpClient();
+                // connect
                 client.Connect(ep);
                 this.stream = client.GetStream();
                 this.reader = new BinaryReader(stream);
@@ -65,18 +75,29 @@ namespace ImageServiceGUI.Client
             return true;
         }
 
+        /// <summary>
+        /// write string to the server
+        /// </summary>
+        /// <param name="str"></param>
         public void WriteToServer(string str)
         {
-            try
+            if (this.Connect)
             {
-                Console.WriteLine("write to server...");
-                writer.Write(str);
-            } catch(Exception e)
-            {
-                Console.WriteLine(e.Message);
+                try
+                {
+                    Console.WriteLine("write to server...");
+                    writer.Write(str);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
 
+        /// <summary>
+        /// read from server all the time, and notify when new message sent
+        /// </summary>
         private void ReadFromServer()
         {
             new Task(() =>
@@ -85,16 +106,17 @@ namespace ImageServiceGUI.Client
                 {
                     try
                     {
+                        // read message
                         string message = reader.ReadString();
                         Console.WriteLine("reading from server: " + message);
+                        MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(message);
 
-                        if (string.Compare(message, "close") == 0)
+                        if (info.ID == CommandEnum.CloseServerCommand)
                         {
                             CloseCommunication();
                             break;
                         }
 
-                        MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(message);
                         this.MessageReceived?.Invoke(this, info);
                     }
                     catch (Exception e)
@@ -106,13 +128,22 @@ namespace ImageServiceGUI.Client
             }).Start();
         }
 
+        /// <summary>
+        /// close the communication
+        /// </summary>
         public void CloseCommunication()
         {
-            endCommunication = true;
-            this.writer.Close();
-            this.reader.Close();
-            this.stream.Close();
-            this.client.Close();
+            try
+            {
+                endCommunication = true;
+                this.writer.Close();
+                this.reader.Close();
+                this.stream.Close();
+                this.client.Close();
+            } catch
+            {
+
+            }
         }
     }
 }

@@ -17,6 +17,11 @@ namespace ImageService.Controller
         /// <param name="resultSuccesful">return if the execute succeed</param>
         /// <returns>return the comand return if succeed, return exception else</returns>
         string ExecuteCommand(int commandID, string[] args, out bool result);          // Executing the Command Requet
+
+        /// <summary>
+        /// set the close command
+        /// </summary>
+        /// <param name="imageServer"></param>
         void SetCloseCommand(ImageServer imageServer);
     }
 }

@@ -22,6 +22,9 @@ namespace ImageServiceGUI.controls
     /// </summary>
     public partial class LogsPage : UserControl
     {
+        /// <summary>
+        /// constructor
+        /// </summary>
         public LogsPage()
         {
             InitializeComponent(); 

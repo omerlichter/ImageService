@@ -11,6 +11,14 @@ namespace ImageServiceGUI.controls.Convertor
 {
     class LogStatusToColorConvertor : IValueConverter
     {
+        /// <summary>
+        /// convert log status to color
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (targetType != typeof(Brush))
@@ -29,14 +37,17 @@ namespace ImageServiceGUI.controls.Convertor
             return brush;
         }
 
+        /// <summary>
+        /// convert log status to color
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (targetType != typeof(Brush))
-            {
-                throw new InvalidOperationException("Must convert to a brush!");
-            }
-            decimal price = (decimal)value;
-            return price > 45 ? Brushes.Red : Brushes.Transparent;
+            return true;
         }
     }
 }

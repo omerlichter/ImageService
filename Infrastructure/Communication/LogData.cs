@@ -10,6 +10,10 @@ namespace ImageService.Infrastructure.Communication
     {
         public List<LogItem> LogsList { get; set; }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="logs"></param>
         public LogData(List<LogItem> logs)
         {
             this.LogsList = logs;

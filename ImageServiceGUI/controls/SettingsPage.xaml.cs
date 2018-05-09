@@ -22,6 +22,9 @@ namespace ImageServiceGUI.controls
     /// </summary>
     public partial class SettingsPage : UserControl
     {
+        /// <summary>
+        /// constructor
+        /// </summary>
         public SettingsPage()
         {
             InitializeComponent();

@@ -22,6 +22,9 @@ namespace ImageServiceGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// constructor
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();

@@ -17,7 +17,16 @@ namespace ImageServiceGUI.Model
         bool ServerConnection { set; get; }
         ObservableCollection<string> LbHandlers { get; }
 
+        /// <summary>
+        /// get settings from service
+        /// </summary>
         void GetSettingsFromService();
+
+        /// <summary>
+        /// remove handler
+        /// </summary>
+        /// <param name="handlerPath"></param>
+        /// <returns>true if remove</returns>
         bool RemoveHandler(string handlerPath);
     }
 }

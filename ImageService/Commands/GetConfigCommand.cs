@@ -11,10 +11,17 @@ namespace ImageService.Commands
 {
     class GetConfigCommand : ICommand
     {
+        /// <summary>
+        /// execute the command.
+        /// </summary>
+        /// <param name="args">args of the command</param>
+        /// <param name="result">return the result</param>
+        /// <returns></returns>
         public string Execute(string[] args, out bool result)
         {
             try
             {
+                // get data from config file
                 string outputDir = ConfigurationManager.AppSettings.Get("OutputDir").ToString();
                 string sourceName = ConfigurationManager.AppSettings.Get("SourceName").ToString();
                 string logName = ConfigurationManager.AppSettings.Get("LogName").ToString();

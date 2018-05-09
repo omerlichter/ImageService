@@ -23,11 +23,18 @@ namespace ImageServiceGUI.Model
             }
         }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public ModelWindow()
         {
             connect = TCPClient.Instance.Connect;
         }
 
+        /// <summary>
+        /// notify that property chnaged
+        /// </summary>
+        /// <param name="propName"></param>
         public void NotifyPropertyChanged(string propName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));

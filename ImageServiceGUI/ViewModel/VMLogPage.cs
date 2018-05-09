@@ -33,6 +33,9 @@ namespace ImageServiceGUI.ViewModel
             get { return this.selectedItem; }
         }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public VMLogPage()
         {
             this.model = new ModelLogPage();
@@ -42,6 +45,10 @@ namespace ImageServiceGUI.ViewModel
             this.model.GetLogsHistoryFromService();
         }
 
+        /// <summary>
+        /// notify that property changed
+        /// </summary>
+        /// <param name="propName"></param>
         public void NotifyPropertyChanged(string propName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));

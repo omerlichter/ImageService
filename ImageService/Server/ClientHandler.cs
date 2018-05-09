@@ -26,6 +26,12 @@ namespace ImageService.Server
         private IImageController m_controller;
         private List<TcpClientInfo> m_clientList;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="logging"></param>
+        /// <param name="imageServer"></param>
+        /// <param name="controller"></param>
         public ClientHandler(ILoggingService logging, ImageServer imageServer, IImageController controller)
         {
             this.m_logging = logging;
@@ -34,7 +40,10 @@ namespace ImageService.Server
             this.m_clientList = new List<TcpClientInfo>();
         }
 
-
+        /// <summary>
+        /// handle the client
+        /// </summary>
+        /// <param name="client">client</param>
         public void HandleClient(TcpClient client)
         {
             new Task(() =>
@@ -51,9 +60,20 @@ namespace ImageService.Server
                 {
                     while (clientConnect)
                     {
+                        // read message from the server
                         string commandLine = reader.ReadString();
                         MessageInfo info = JsonConvert.DeserializeObject<MessageInfo>(commandLine);
 
+                        // if the command is CloseGUICommand
+                        if (info.ID == CommandEnum.CloseGUICommand)
+                        {
+                            clientConnect = false;
+                            this.m_clientList.Remove(clientInfo);
+                            client.Close();
+                            this.m_logging.Log("Client DisConnected", MessageTypeEnum.INFO);
+                            return;
+                        }
+                        // if the command is CloseCommand
                         if (info.ID == CommandEnum.CloseCommand)
                         {
                             bool result;
@@ -76,6 +96,7 @@ namespace ImageService.Server
                         }
                         else
                         {
+                            // execute the command
                             bool result;
                             string[] executeArgs = { info.Args };
                             string value = this.m_controller.ExecuteCommand((int)info.ID, executeArgs, out result);
@@ -98,15 +119,22 @@ namespace ImageService.Server
                     }
                 } catch(Exception e)
                 {
+                    clientConnect = false;
                     client.Close();
                     this.m_clientList.Remove(clientInfo);
                     return;
                 }
+                clientConnect = false;
                 client.Close();
                 this.m_clientList.Remove(clientInfo);
             }).Start();
         }
 
+        /// <summary>
+        /// send log to all clients
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void SendLogToAllClients(object sender, MessageRecievedEventArgs args)
         {
             new Task(() =>
@@ -119,6 +147,7 @@ namespace ImageService.Server
                 MessageInfo info = new MessageInfo(CommandEnum.LogCommand, serializeArgs);
                 string message = JsonConvert.SerializeObject(info);
 
+                // send the log to all connected clients
                 foreach (TcpClientInfo clientInfo in this.m_clientList)
                 {
                     try
@@ -129,15 +158,21 @@ namespace ImageService.Server
                     } catch(Exception e)
                     {
                         this.m_clientList.Remove(clientInfo);
+                        clientInfo.TcpClient.Close();
                     }
                 }
             }).Start();
         }
 
+        /// <summary>
+        /// send message to all client
+        /// </summary>
+        /// <param name="message"></param>
         public void SendMessageToAllClients(string message)
         {
             new Task(() =>
             {
+                // send message to all connected clients
                 foreach (TcpClientInfo clientInfo in this.m_clientList)
                 {
                     try
@@ -149,6 +184,7 @@ namespace ImageService.Server
                     catch (Exception e)
                     {
                         this.m_clientList.Remove(clientInfo);
+                        clientInfo.TcpClient.Close();
                     }
                 }
             }).Start();

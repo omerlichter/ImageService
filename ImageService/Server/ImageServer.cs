@@ -49,10 +49,10 @@ namespace ImageService.Server
             }
         }
 
-    /// <summary>
-    /// craete handler to monitoring the directory path.
-    /// </summary>
-    /// <param name="directoryPath">path to the directory</param>
+        /// <summary>
+        /// craete handler to monitoring the directory path.
+        /// </summary>
+        /// <param name="directoryPath">path to the directory</param>
         public void CreateHandler(string directoryPath)
         {
             // create handler

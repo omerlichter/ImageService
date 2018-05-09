@@ -11,6 +11,11 @@ namespace ImageService.Logging
     {
         List<MessageRecievedEventArgs> LogsHistory { get; }
 
+        /// <summary>
+        /// add log to history
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         void AddLog(object sender, MessageRecievedEventArgs args);
     }
 }

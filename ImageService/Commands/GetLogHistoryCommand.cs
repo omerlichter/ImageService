@@ -15,15 +15,26 @@ namespace ImageService.Commands
     {
         private ILoggingHistory m_loggingHistory;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="loggingHistory">logging history</param>
         public GetLogHistoryCommand(ILoggingHistory loggingHistory)
         {
             this.m_loggingHistory = loggingHistory;
         }
 
+        /// <summary>
+        /// execute the command.
+        /// </summary>
+        /// <param name="args">args of the command</param>
+        /// <param name="result">return the result</param>
+        /// <returns></returns>
         public string Execute(string[] args, out bool result)
         {
             try
             {
+                // go over all the logs in log history
                 List<LogItem> logsList = new List<LogItem>();
                 foreach(MessageRecievedEventArgs messageArgs in this.m_loggingHistory.LogsHistory)
                 {

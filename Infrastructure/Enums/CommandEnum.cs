@@ -12,6 +12,8 @@ namespace ImageService.Infrastructure.Enums
         GetConfigCommand,
         LogCommand,
         CloseCommand,
+        CloseGUICommand,
+        CloseServerCommand,
         FailCommand
     }
 }

@@ -51,6 +51,10 @@ namespace ImageService.Controller
             return "error: the command ID not exist";
         }
 
+        /// <summary>
+        /// set the close command
+        /// </summary>
+        /// <param name="imageServer"></param>
         public void SetCloseCommand(ImageServer imageServer)
         {
             commands.Add((int)CommandEnum.CloseCommand, new CloseCommand(imageServer));

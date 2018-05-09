@@ -59,6 +59,9 @@ namespace ImageServiceGUI.ViewModel
             get { return this.selectedItem; }
         }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public VMSettingsPage()
         {
             this.model = new ModelSettingsPage();
@@ -69,12 +72,21 @@ namespace ImageServiceGUI.ViewModel
             this.model.GetSettingsFromService();
         }
 
+        /// <summary>
+        /// on remove, button function
+        /// </summary>
+        /// <param name="obj">path of the handler to remove</param>
         private void OnRemove(object obj)
         {
             // send to server remove from handlers
             this.model.RemoveHandler(this.selectedItem);
         }
 
+        /// <summary>
+        /// can remove, button activation
+        /// </summary>
+        /// <param name="obj">item that selected</param>
+        /// <returns></returns>
         private bool CanRemove(object obj)
         {
             if (selectedItem != null)
@@ -84,6 +96,10 @@ namespace ImageServiceGUI.ViewModel
             return false;
         }
 
+        /// <summary>
+        /// notify property changed
+        /// </summary>
+        /// <param name="propName"></param>
         public void NotifyPropertyChanged(string propName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));

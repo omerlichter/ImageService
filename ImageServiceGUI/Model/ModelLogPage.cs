@@ -30,17 +30,27 @@ namespace ImageServiceGUI.Model
             }
         }
 
+        /// <summary>
+        /// constructor
+        /// </summary>
         public ModelLogPage()
         {
             TCPClient client = TCPClient.Instance;
             client.MessageReceived += GetMessageFromClient;
         }
 
+        /// <summary>
+        /// notify that property changed
+        /// </summary>
+        /// <param name="propName"></param>
         public void NotifyPropertyChanged(string propName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
+        /// <summary>
+        /// send to server to get log history
+        /// </summary>
         public void GetLogsHistoryFromService()
         {
             TCPClient client = TCPClient.Instance;
@@ -49,8 +59,14 @@ namespace ImageServiceGUI.Model
             client.WriteToServer(command);
         }
 
+        /// <summary>
+        /// get message from the server by the client class
+        /// </summary>
+        /// <param name="sender">sender of the message</param>
+        /// <param name="info">message info</param>
         public void GetMessageFromClient(object sender, MessageInfo info)
         {
+            // if the command is log command
             if (info.ID == CommandEnum.LogCommand)
             {
                 try

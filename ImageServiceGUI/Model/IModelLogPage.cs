@@ -15,6 +15,9 @@ namespace ImageServiceGUI.Model
     {
         ObservableCollection<LogItem> LogsList { get; set; }
 
+        /// <summary>
+        /// get log history
+        /// </summary>
         void GetLogsHistoryFromService();
     }
 }

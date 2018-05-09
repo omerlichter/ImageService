@@ -1,6 +1,9 @@
 ﻿using ImageService.Controller;
+using ImageService.Infrastructure.Communication;
+using ImageService.Infrastructure.Enums;
 using ImageService.Logging;
 using ImageService.Logging.Modal;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +26,13 @@ namespace ImageService.Server
 
         private bool closeCommunication;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="imageServer"></param>
+        /// <param name="imageController"></param>
+        /// <param name="logging"></param>
+        /// <param name="port"></param>
         public CommunicationServer(ImageServer imageServer, IImageController imageController, ILoggingService logging, int port)
         {
             this.m_port = port;
@@ -33,8 +43,12 @@ namespace ImageService.Server
             this.m_logging.MessageRecieved += this.m_ch.SendLogToAllClients;
         }
 
+        /// <summary>
+        /// start the server
+        /// </summary>
         public void Start()
         {
+            // set
             this.closeCommunication = false;
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), this.m_port);
             this.m_listener = new TcpListener(ep);
@@ -47,6 +61,7 @@ namespace ImageService.Server
                 {
                     try
                     {
+                        // accept client
                         TcpClient client = this.m_listener.AcceptTcpClient();
                         this.m_logging.Log("Client Connected", MessageTypeEnum.INFO);
                         this.m_ch.HandleClient(client);
@@ -61,9 +76,14 @@ namespace ImageService.Server
             task.Start();
         }
 
+        /// <summary>
+        /// close communication
+        /// </summary>
         public void CloseCommunication()
         {
-            this.m_ch.SendMessageToAllClients("close");
+            MessageInfo info = new MessageInfo(CommandEnum.CloseServerCommand, null);
+            string message = JsonConvert.SerializeObject(info);
+            this.m_ch.SendMessageToAllClients(message);
             this.closeCommunication = true;
             this.m_listener.Stop();
         }

@@ -3,14 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:ImageServiceGUI"
         xmlns:convertor="clr-namespace:ImageServiceGUI.controls.Convertor"
         xmlns:controls="clr-namespace:ImageServiceGUI.controls"
         mc:Ignorable="d"
         Title="Image Service GUI" Height="350" Width="525">
-    <Window.Resources>
-        <convertor:ConnectionToBackgroundConvertor x:Key="connectionToBackgroundConvertor"/>
-    </Window.Resources>
+    
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction  Command="{Binding CloseWindowCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     
     <Grid>
         <Button>
