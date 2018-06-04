@@ -1,0 +1,53 @@
+﻿@model ImageServiceWeb.Models.ModelImageWeb
+
+@{
+    ViewBag.Title = "ImageWeb";
+}
+
+<h2>Image Web</h2>
+<p>
+    Welcome to Image Web!!!!
+</p>
+
+<div>
+    <p>Server Status: </p>
+    @if (Model.ServerStatus == 0)
+    {
+        <p>connect!</p>
+    }
+    else
+    {
+        <p>disconnect</p>
+    }
+     
+</div>
+
+
+<p>
+    num of images: @Html.DisplayFor(model => model.NumOfImages)
+</p>
+
+<table class="table">
+    <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>ID</th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Students)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ID)
+            </td>
+        </tr>
+    }
+</table>
+

@@ -1,0 +1,52 @@
+﻿
+@{
+    ViewBag.Title = "AjaxView";
+}
+
+<h2>AjaxView</h2>
+
+<div>
+    <h2>Employee json Get</h2>
+    <table>
+        <tr>
+            <td>Id:  </td>
+            <td><p type="text" id="prodId" size="5"></p></td>
+        </tr>
+        <tr>
+            <td>Name:  </td>
+            <td><p type="text" id="prodName" size="5"></p></td>
+        </tr>
+    </table>
+     <button type="button" id="btnStart" style="margin:10px">Get Data</button>
+
+    <div>
+        <h2>Search  by  Salary and Name</h2>
+        <p> Salary: </p>
+        <input type="text" id="txtSalaryId" size="5" />
+        <p> Name: </p>
+        <input type="text" id="NameID" size="5" />
+        <input type="button" id="btnSearch" value="Search" />
+        <ul id="lstProducts"></ul>
+    </div>
+
+</div>
+
+<script>
+    $("#btnStart").click(function () {
+        $.getJSON("@Url.Action("GetEmployee")", function (empl) {
+            $("#prodId").text(empl.FirstName);
+            $("#prodName").text(empl.LastName);
+        });
+    });
+
+    $("#btnSearch").click(function () {
+        var input = {
+            name:$("#NameID").val(),
+            salary: $("#txtSalaryId").val()
+        };
+        $.post("@Url.Action("GetEmployee")", input, function (data) {
+            $("#lstProducts").append("<li>" + data.FirstName + " " + data.LastName + " : $" + data.Salary + "</li>");
+        }, "json");
+    });
+
+</script>

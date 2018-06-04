@@ -1,0 +1,30 @@
+﻿@model ImageServiceWeb.Models.ModelConfig
+
+@{
+    ViewBag.Title = "Config";
+}
+<h2>Config</h2>
+
+<p>
+    <b>@Html.DisplayNameFor(model => model.OutputDir):</b> @Html.DisplayFor(model => model.OutputDir)
+</p>
+<p>
+    <b>@Html.DisplayNameFor(model => model.SourceName):</b> @Html.DisplayFor(model => model.SourceName)
+</p>
+<p>
+    <b>@Html.DisplayNameFor(model => model.LogName):</b> @Html.DisplayFor(model => model.LogName)
+</p>
+<p>
+    <b>@Html.DisplayNameFor(model => model.ThumbnailSize):</b> @Html.DisplayFor(model => model.ThumbnailSize)
+</p>
+
+<table class="table">
+    @foreach (var item in Model.Handlers)
+    {
+        <tr>
+            <td>
+                @item
+            </td>
+        </tr>
+    }
+</table>
