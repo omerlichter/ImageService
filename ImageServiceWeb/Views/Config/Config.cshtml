@@ -18,13 +18,25 @@
     <b>@Html.DisplayNameFor(model => model.ThumbnailSize):</b> @Html.DisplayFor(model => model.ThumbnailSize)
 </p>
 
+</table>
+
+
 <table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Handlers)
+        </th>
+    </tr>
     @foreach (var item in Model.Handlers)
     {
         <tr>
+
             <td>
-                @item
+                @Html.ActionLink(@item, "DeleteHandler", new { handler = item })
             </td>
+
         </tr>
     }
+
+
 </table>

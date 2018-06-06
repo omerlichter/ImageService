@@ -45,6 +45,10 @@ namespace ImageServiceWeb.Models
         [Display(Name = "Connect")]
         public bool Connect { get; set; }
 
+        public string LastHandler { get; set; }
+
+        private TCPClient client;
+
         public static ModelConfig Instance
         {
             get
@@ -59,8 +63,11 @@ namespace ImageServiceWeb.Models
 
         private ModelConfig()
         {
-            TCPClient client = TCPClient.Instance;
-            client.MessageReceived += MessageRecivedHandler;
+            this.LastHandler = "";
+            this.Handlers = new List<string>();
+
+            this.client = TCPClient.Instance;
+            this.client.MessageReceived += MessageRecivedHandler;
             this.Connect = client.Connect;
 
             MessageInfo messageInfo = new MessageInfo(CommandEnum.GetConfigCommand, null);
@@ -79,10 +86,27 @@ namespace ImageServiceWeb.Models
                     this.SourceName = configData.SourceName;
                     this.LogName = configData.LogName;
                     this.ThumbnailSize = configData.ThumbnailSize;
-                    this.Handlers = configData.Handlers;
+                    foreach (string handler in configData.Handlers)
+                    {
+                        this.Handlers.Add(handler);
+                    }
+                    Update?.Invoke(this, null);
+                }
+
+                if (info.ID == CommandEnum.CloseCommand)
+                {
+                    string handler = info.Args;
+                    this.Handlers.Remove(handler);
                     Update?.Invoke(this, null);
                 }
             }
+        }
+
+        public void DeleteHandler()
+        {
+            MessageInfo messageInfo = new MessageInfo(CommandEnum.CloseCommand, this.LastHandler);
+            string message = JsonConvert.SerializeObject(messageInfo);
+            this.client.WriteToServer(message);
         }
     }
 }

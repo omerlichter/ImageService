@@ -44,7 +44,7 @@
             name:$("#NameID").val(),
             salary: $("#txtSalaryId").val()
         };
-        $.post("@Url.Action("GetEmployee")", input, function (data) {
+        $.post("@Url.Action("DeleteHandler")", input, function (data) {
             $("#lstProducts").append("<li>" + data.FirstName + " " + data.LastName + " : $" + data.Salary + "</li>");
         }, "json");
     });

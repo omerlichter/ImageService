@@ -148,6 +148,8 @@
     <Content Include="Web.config" />
     <Content Include="Views\ImageWeb\ImageWeb.cshtml" />
     <Content Include="Views\Config\Config.cshtml" />
+    <Content Include="Views\Logs\Logs.cshtml" />
+    <Content Include="Views\Config\Confirm.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -161,12 +163,14 @@
     <Compile Include="Controllers\ConfigController.cs" />
     <Compile Include="Controllers\FirstController.cs" />
     <Compile Include="Controllers\ImageWebController.cs" />
+    <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\ModelConfig.cs" />
     <Compile Include="Models\ModelImageWeb.cs" />
+    <Compile Include="Models\ModelLogs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

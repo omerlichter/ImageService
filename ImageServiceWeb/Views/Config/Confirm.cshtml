@@ -1,0 +1,22 @@
+﻿@model ImageServiceWeb.Models.ModelConfig
+
+@{
+    ViewBag.Title = "Confirm";
+}
+<h2>Confirm</h2>
+<p>Do you want to delete @Model.LastHandler?</p>
+
+<button type="button" id="btnCancel">Cancel</button>
+<button type="button" id="btnOK">OK</button>
+
+<script>
+    $("#btnCancel").click(function () {
+        window.location.href = "Config";
+    });
+
+    $("#btnOK").click(function () {
+        $.post("@Url.Action("DeleteHandlerOK")", function () {
+            window.location.href = "Config";
+        });
+    });
+</script>

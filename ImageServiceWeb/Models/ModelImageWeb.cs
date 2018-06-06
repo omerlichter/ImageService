@@ -31,6 +31,7 @@ namespace ImageServiceWeb.Models
 
         public ModelImageWeb()
         {
+            this.Students = new List<StudentInfo>();
             outputDir = "";
             ModelConfig modelConfig = ModelConfig.Instance;
             modelConfig.Update += UpdateHandler;
@@ -83,7 +84,6 @@ namespace ImageServiceWeb.Models
                     StudentInfo si = new StudentInfo(stringSplit[0], stringSplit[1], int.Parse(stringSplit[2]));
                     studentsList.Add(si);
                 }
-
                 fs.Close();
             } catch (Exception e)
             {
