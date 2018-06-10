@@ -11,10 +11,12 @@ namespace ImageServiceWeb.Controllers
 {
     public class ConfigController : Controller
     {
+        static ModelConfig model = new ModelConfig();
+
         public ConfigController()
         {
-            ModelConfig.Instance.Update -= Update;
-            ModelConfig.Instance.Update += Update;
+            model.Update -= Update;
+            model.Update += Update;
         }
 
         private void Update(Object sender, EventArgs args)
@@ -25,27 +27,27 @@ namespace ImageServiceWeb.Controllers
         // GET: Config
         public ActionResult Config()
         {
-            return View(ModelConfig.Instance);
+            return View(model);
         }
 
         // GET: Config/DeleteHandler/
         public ActionResult DeleteHandler(string handler)
         {
-            ModelConfig.Instance.LastHandler = handler;
+            model.LastHandler = handler;
             return RedirectToAction("Confirm");
         }
 
         [HttpPost]
         public ActionResult DeleteHandlerOK(string handler)
         {
-            ModelConfig.Instance.DeleteHandler();
+            model.DeleteHandler();
             return RedirectToAction("Config");
         }
 
         // GET: Confirm
         public ActionResult Confirm()
         {
-            return View(ModelConfig.Instance);
+            return View(model);
         }
     }
 }

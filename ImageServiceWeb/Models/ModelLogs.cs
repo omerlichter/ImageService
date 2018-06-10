@@ -36,7 +36,8 @@ namespace ImageServiceWeb.Models
                 if (info.ID == CommandEnum.LogCommand)
                 {
                     LogData logsData = JsonConvert.DeserializeObject<LogData>(info.Args);
-                    this.Logs = logsData.LogsList;
+                    foreach (LogItem item in logsData.LogsList)
+                    this.Logs.Add(item);
                     Update?.Invoke(this, null);
                 }
             }

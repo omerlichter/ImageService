@@ -25,6 +25,21 @@ namespace ImageServiceWeb.Controllers
         // GET: Logs
         public ActionResult Logs()
         {
+            ViewBag.filter = "";
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Logs(FormCollection form)
+        {
+            string logType = form["typeFilter"].ToString();
+            if (logType == null)
+            {
+                ViewBag.filter = "";
+            } else
+            {
+                ViewBag.filter = logType;
+            }
             return View(model);
         }
     }

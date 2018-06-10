@@ -26,6 +26,7 @@ namespace ImageServiceWeb.Controllers
         // GET: ImageWeb
         public ActionResult ImageWeb()
         {
+            model.CheckUpdate();
             return View(model);
         }
     }

@@ -48,6 +48,10 @@ namespace ImageService.Commands
                         sb.Append(";");
                     }
                 }
+                if (handlers.Length > 0)
+                {
+                    sb.Remove(sb.Length - 1, 1);
+                }
                 ConfigurationManager.AppSettings.Set("Handler", sb.ToString());
                 result = true;
                 return args[0];

@@ -14,8 +14,6 @@ namespace ImageServiceWeb.Models
     {
         public event EventHandler Update;
 
-        private static ModelConfig instance;
-
         [Required]
         [DataType(DataType.Text)]
         [Display(Name = "OutputDir")]
@@ -47,27 +45,20 @@ namespace ImageServiceWeb.Models
 
         public string LastHandler { get; set; }
 
-        private TCPClient client;
+        private static TCPClient client;
 
-        public static ModelConfig Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new ModelConfig();
-                }
-                return instance;
-            }
-        }
-
-        private ModelConfig()
+        public ModelConfig()
         {
             this.LastHandler = "";
+            this.OutputDir = "";
+            this.SourceName = "";
+            this.LogName = "";
+            this.ThumbnailSize = 0;
+            this.Connect = false;
             this.Handlers = new List<string>();
 
-            this.client = TCPClient.Instance;
-            this.client.MessageReceived += MessageRecivedHandler;
+            client = TCPClient.Instance;
+            client.MessageReceived += MessageRecivedHandler;
             this.Connect = client.Connect;
 
             MessageInfo messageInfo = new MessageInfo(CommandEnum.GetConfigCommand, null);
@@ -86,6 +77,7 @@ namespace ImageServiceWeb.Models
                     this.SourceName = configData.SourceName;
                     this.LogName = configData.LogName;
                     this.ThumbnailSize = configData.ThumbnailSize;
+                    this.Handlers = new List<string>();
                     foreach (string handler in configData.Handlers)
                     {
                         this.Handlers.Add(handler);
@@ -106,7 +98,7 @@ namespace ImageServiceWeb.Models
         {
             MessageInfo messageInfo = new MessageInfo(CommandEnum.CloseCommand, this.LastHandler);
             string message = JsonConvert.SerializeObject(messageInfo);
-            this.client.WriteToServer(message);
+            client.WriteToServer(message);
         }
     }
 }

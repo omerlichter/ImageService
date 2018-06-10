@@ -1,0 +1,23 @@
+﻿@model ImageServiceWeb.Models.ModelPhotos
+
+@{
+    ViewBag.Title = "DeletePhoto";
+}
+
+<h2>Delete Photo</h2>
+<p>Do you want to delete @ViewBag.photoPath?</p>
+
+<button type="button" id="btnCancel">Cancel</button>
+<button type="button" id="btnOK">OK</button>
+
+<script>
+    $("#btnCancel").click(function () {
+        window.location.href = "Photos";
+    });
+
+    $("#btnOK").click(function () {
+        $.post("@Url.Action("DeletePhotoOK")", function () {
+            window.location.href = "Photos";
+        });
+    });
+</script>

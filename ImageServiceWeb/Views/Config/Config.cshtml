@@ -32,7 +32,10 @@
         <tr>
 
             <td>
-                @Html.ActionLink(@item, "DeleteHandler", new { handler = item })
+                @if (item != "")
+                {
+                    @Html.ActionLink(@item, "DeleteHandler", new { handler = item })
+                }
             </td>
 
         </tr>

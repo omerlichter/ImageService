@@ -13,12 +13,14 @@ namespace ImageServiceWeb.Models
     {
         public event EventHandler Update;
 
+        private static ModelConfig modelConfig;
+
         private string outputDir;
 
         [Required]
         [DataType(DataType.Text)]
         [Display(Name = "ServerStatus")]
-        public int ServerStatus { get; set; }
+        public bool ServerStatus { get; set; }
 
         [Required]
         [DataType(DataType.Text)]
@@ -33,20 +35,34 @@ namespace ImageServiceWeb.Models
         {
             this.Students = new List<StudentInfo>();
             outputDir = "";
-            ModelConfig modelConfig = ModelConfig.Instance;
+            modelConfig = new ModelConfig();
             modelConfig.Update += UpdateHandler;
+        }
+
+        public void CheckUpdate()
+        {
+            this.outputDir = modelConfig.OutputDir;
+            this.NumOfImages = GetNumberOfImagesInFile(this.outputDir);
+            this.Students = GetStudentsFromFile();
+            this.ServerStatus = modelConfig.Connect;
         }
 
         private void UpdateHandler(Object sender, EventArgs args)
         {
-            this.outputDir = ModelConfig.Instance.OutputDir;
+            this.outputDir = modelConfig.OutputDir;
             this.NumOfImages = GetNumberOfImagesInFile(this.outputDir);
             this.Students = GetStudentsFromFile();
+            this.ServerStatus = modelConfig.Connect;
             Update?.Invoke(this, null);
         }
 
         private int GetNumberOfImagesInFile(string outputFile)
         {
+            if (outputFile == "" || outputFile == null)
+            {
+                return 0;
+            }
+
             int counter = 0;
             try
             {
@@ -62,7 +78,7 @@ namespace ImageServiceWeb.Models
                     counter += directory.GetFiles("*.GIF", SearchOption.AllDirectories).Length;
                     counter += directory.GetFiles("*.JPG", SearchOption.AllDirectories).Length;
                 }
-            } catch (Exception e)
+            } catch (Exception)
             {
 
             }
@@ -85,7 +101,7 @@ namespace ImageServiceWeb.Models
                     studentsList.Add(si);
                 }
                 fs.Close();
-            } catch (Exception e)
+            } catch (Exception)
             {
 
             }

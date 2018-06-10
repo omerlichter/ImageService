@@ -1,4 +1,6 @@
-﻿@model ImageServiceWeb.Models.ModelLogs
+﻿@using ImageService.Logging.Modal
+
+@model ImageServiceWeb.Models.ModelLogs
 
 @{
     ViewBag.Title = "Logs";
@@ -6,16 +8,44 @@
 
 <h2>Logs</h2>
 
+<div>
+    @using (Html.BeginForm("Logs", "Logs", FormMethod.Post))
+    {
+
+        <div>
+            <h4>Filter</h4>
+            @Html.DropDownList("typeFilter",
+                         new SelectList(Enum.GetValues(typeof(MessageTypeEnum))),
+                         "Log type",
+                         new { @class = "form-control" })
+            <br/>
+            <input type="submit" id="submitId" value="Filter" class="btn-info" />
+
+        </div>
+
+    }
+
+</div>
+
+<br/>
+@if (ViewBag.filter != "")
+{
+    <h4>filter by: @ViewBag.filter</h4>
+}
+
 <table class="table">
     @foreach (var item in Model.Logs)
     {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LogType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LogMessage)
-            </td>
+            @if (ViewBag.filter == "" || ViewBag.filter == item.LogType.ToString())
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.LogType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LogMessage)
+                </td>
+            }
         </tr>
     }
 </table>
