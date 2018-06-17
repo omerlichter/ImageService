@@ -22,6 +22,7 @@ namespace ImageService.Server
         private IImageController m_controller;
         private ILoggingService m_logging;
         private CommunicationServer m_communicationServer;
+        private MobileServer m_mobileServer;
         #endregion
 
         #region Properties
@@ -40,6 +41,8 @@ namespace ImageService.Server
             this.m_logging = logging;
             this.m_communicationServer = new CommunicationServer(this, this.m_controller, this.m_logging, 12345);
             this.m_communicationServer.Start();
+            this.m_mobileServer = new MobileServer(this, this.m_controller, this.m_logging, 8000);
+            this.m_mobileServer.Start();
 
             // create handlers for all the directories
             string[] directories = ConfigurationManager.AppSettings.Get("Handler").Split(';');
