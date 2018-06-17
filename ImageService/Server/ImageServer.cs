@@ -28,6 +28,7 @@ namespace ImageService.Server
         #region Properties
         public event EventHandler<CommandRecievedEventArgs> CommandRecieved;          // The event that notifies about a new Command being recieved
         public event EventHandler ServerClosed;
+        public List<string> Handlers { get; set; }
         #endregion
 
         /// <summary>
@@ -44,6 +45,7 @@ namespace ImageService.Server
             this.m_mobileServer = new MobileServer(this, this.m_controller, this.m_logging, 8000);
             this.m_mobileServer.Start();
 
+            Handlers = new List<string>();
             // create handlers for all the directories
             string[] directories = ConfigurationManager.AppSettings.Get("Handler").Split(';');
             foreach(string directoryPath in directories)
@@ -65,6 +67,7 @@ namespace ImageService.Server
             directoryHandler.DirectoryClose += this.DeleteHandler;
             // start the handler
             directoryHandler.StartHandleDirectory(directoryPath);
+            Handlers.Add(directoryPath);
         }
 
         /// <summary>
@@ -87,6 +90,7 @@ namespace ImageService.Server
             CommandRecieved -= directoryHandler.OnCommandRecieved;
             directoryHandler.DirectoryClose -= this.DeleteHandler;
             this.m_logging.Log(e.Message, MessageTypeEnum.INFO);
+            Handlers.Remove(directoryHandler.path);
         }
 
         /// <summary>

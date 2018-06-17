@@ -24,6 +24,7 @@ namespace ImageService.Controller.Handlers
 
         #region Properties
         public event EventHandler<DirectoryCloseEventArgs> DirectoryClose;              // The Event That Notifies that the Directory is being closed
+        public string path { get; set; }
         #endregion
 
         /// <summary>
@@ -44,6 +45,7 @@ namespace ImageService.Controller.Handlers
         public void StartHandleDirectory(string dirPath)
         {
             this.m_path = dirPath;
+            path = this.m_path;
             try
             {
                 // add dirWatcher
