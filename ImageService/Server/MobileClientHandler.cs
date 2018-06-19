@@ -39,7 +39,7 @@ namespace ImageService.Server
                     b[0] = 1;
                     stream.Write(b, 0, 1);
                     byte[] photoArr = GetPhoto(stream);
-                    File.WriteAllBytes(m_imageServer.Handlers[0] + @"\" + fileName + ".png", photoArr);
+                    File.WriteAllBytes(m_imageServer.Handlers[0] + "\\" + fileName + ".png", photoArr);
                 }
             }).Start();
         }
@@ -60,14 +60,11 @@ namespace ImageService.Server
         {
             int i = 0;
             List<Byte> byteList = new List<Byte>();
-            Byte[] b = new Byte[1024];
+            Byte[] b = new Byte[1];
             do
             {
                 i = stream.Read(b, 0, b.Length);
-                for(int j = 0; j < i; j++)
-                {
-                    byteList.Add(b[j]);
-                }
+                byteList.Add(b[0]);
             } while (stream.DataAvailable);
             return byteList.ToArray();
         }
